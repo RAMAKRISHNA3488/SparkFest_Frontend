@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 async function handleResponse(response) {
   const data = await response.json().catch(() => ({}));
@@ -111,6 +111,24 @@ export const api = {
     return handleResponse(res);
   },
 
+  async adminVerify2Fa(challengeToken, otp) {
+    const res = await fetch(`${API_BASE}/admin/verify-2fa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ challengeToken, otp })
+    });
+    return handleResponse(res);
+  },
+
+  async getAdminRegistrations(token, params = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/admin/registrations?${query}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return handleResponse(res);
+  },
+
+
   async getAdminDashboard(token) {
     const res = await fetch(`${API_BASE}/admin/dashboard`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -145,6 +163,18 @@ export const api = {
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({ prizeId })
+    });
+    return handleResponse(res);
+  },
+
+  async executeAdminSpin(planType, token) {
+    const res = await fetch(`${API_BASE}/admin/spin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ planType })
     });
     return handleResponse(res);
   }

@@ -1,0 +1,12 @@
+name = "sparkfest-frontend"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "dist"
+
+# Cloudflare D1 Database Binding for Cloudflare Pages Functions
+[[d1_databases]]
+binding = "DB"
+database_name = "viswasluckydraw_db"
+database_id = "ffd21a79-cb5b-4b4f-b607-6e930b4478ef"
+
+[vars]
+ENVIRONMENT = "production"

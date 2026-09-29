@@ -99,7 +99,7 @@ export default function Navbar() {
         </nav>
 
         {/* Right CTA */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-2.5">
           <Link
             to="/live-draw"
             className="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-full relative group overflow-hidden border border-rose-500/60 hover:border-rose-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(244,63,94,0.7)]"
@@ -121,11 +121,12 @@ export default function Navbar() {
           </Link>
 
           <Link
-            to="/participate"
+            to="/admin"
             className="group relative inline-flex items-center gap-2 px-5 py-2 rounded-full font-bold text-xs sm:text-sm text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:shadow-[0_0_30px_rgba(229,179,47,0.7)] hover:scale-105 active:scale-95 transition-all duration-200"
+            title="Admin Portal"
           >
-            <Gift className="w-4 h-4 text-[#0b0d1e] animate-bounce transition-transform group-hover:scale-125" />
-            <span>ENTER NOW</span>
+            <ShieldCheck className="w-4 h-4 text-[#0b0d1e] transition-transform group-hover:scale-110" />
+            <span>ADMIN</span>
             <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
@@ -133,17 +134,19 @@ export default function Navbar() {
         {/* Mobile Hamburger Toggle */}
         <div className="flex sm:hidden items-center gap-2">
           <Link
-            to="/participate"
-            className="px-3 py-1.5 rounded-full text-xs font-bold text-[#0b0d1e] bg-[#e5b32f]"
+            to="/admin"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow"
+            title="Admin Portal"
           >
-            ENTER
+            <ShieldCheck className="w-3.5 h-3.5 text-[#0b0d1e]" />
+            <span>ADMIN</span>
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg text-[#ffe58f] hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#e5b32f]"
+            className="p-2 rounded-xl bg-white/5 border border-white/10 text-[#ffe58f] hover:bg-white/10 focus:outline-none"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -176,16 +179,17 @@ export default function Navbar() {
               Watch Live Draw Room
             </Link>
             <Link
-              to="/participate"
+              to="/admin"
               className="flex items-center justify-center gap-2 w-full py-3 rounded-full text-sm font-bold text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow"
             >
-              <Sparkles className="w-4 h-4 text-[#0b0d1e]" />
-              <span>ENTER LUCKY DRAW NOW</span>
+              <ShieldCheck className="w-4 h-4 text-[#0b0d1e]" />
+              <span>ADMIN PANEL</span>
               <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       )}
+
     </header>
   );
 }
