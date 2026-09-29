@@ -2,7 +2,12 @@ name = "sparkfest-frontend"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "dist"
 
-# Cloudflare D1 Database Binding for Cloudflare Pages Functions
+# Cloudflare Assets Directory (fixes "Missing entry-point to Worker script or to assets directory")
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+# Cloudflare D1 Database Binding
 [[d1_databases]]
 binding = "DB"
 database_name = "viswasluckydraw_db"
