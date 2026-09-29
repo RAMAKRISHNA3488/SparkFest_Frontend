@@ -78,49 +78,49 @@ export default function CountdownTimer({ targetDate, onStatusChange, variant = '
 
   // Variant: Default Hero Card (Matching the Reference Image exactly)
   return (
-    <div className="inline-flex items-center gap-2 sm:gap-6 px-4 sm:px-8 py-4 rounded-2xl bg-transparent border border-amber-400/30 backdrop-blur-sm animate-container-float">
+    <div className="inline-flex items-center gap-1.5 sm:gap-6 px-3 sm:px-8 py-2.5 sm:py-4 rounded-2xl bg-[#080a1c]/80 sm:bg-transparent border border-amber-400/40 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.5)] animate-container-float max-w-full">
       {/* Days */}
-      <div className="flex flex-col items-center min-w-[50px] sm:min-w-[70px]">
-        <span className="font-['Cinzel_Decorative'] text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.6)] animate-shimmer">
+      <div className="flex flex-col items-center min-w-[44px] sm:min-w-[70px]">
+        <span className="font-['Cinzel_Decorative'] text-2xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.6)] animate-shimmer">
           {pad(timeLeft.days)}
         </span>
-        <span className="text-[10px] sm:text-sm uppercase tracking-[0.2em] text-amber-200/80 font-medium mt-1">
+        <span className="text-[9px] sm:text-sm uppercase tracking-[0.12em] sm:tracking-[0.2em] text-amber-200/80 font-semibold mt-0.5 sm:mt-1">
           Days
         </span>
       </div>
 
-      <div className="h-10 w-px bg-gradient-to-b from-transparent via-amber-400/50 to-transparent"></div>
+      <div className="h-7 sm:h-10 w-px bg-gradient-to-b from-transparent via-amber-400/50 to-transparent"></div>
 
       {/* Hours */}
-      <div className="flex flex-col items-center min-w-[50px] sm:min-w-[70px]">
-        <span className="font-['Cinzel_Decorative'] text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.6)] animate-shimmer">
+      <div className="flex flex-col items-center min-w-[44px] sm:min-w-[70px]">
+        <span className="font-['Cinzel_Decorative'] text-2xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.6)] animate-shimmer">
           {pad(timeLeft.hours)}
         </span>
-        <span className="text-[10px] sm:text-sm uppercase tracking-[0.2em] text-amber-200/80 font-medium mt-1">
+        <span className="text-[9px] sm:text-sm uppercase tracking-[0.12em] sm:tracking-[0.2em] text-amber-200/80 font-semibold mt-0.5 sm:mt-1">
           Hours
         </span>
       </div>
 
-      <div className="h-10 w-px bg-gradient-to-b from-transparent via-amber-400/50 to-transparent"></div>
+      <div className="h-7 sm:h-10 w-px bg-gradient-to-b from-transparent via-amber-400/50 to-transparent"></div>
 
       {/* Minutes */}
-      <div className="flex flex-col items-center min-w-[50px] sm:min-w-[70px]">
-        <span className="font-['Cinzel_Decorative'] text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.6)] animate-shimmer">
+      <div className="flex flex-col items-center min-w-[44px] sm:min-w-[70px]">
+        <span className="font-['Cinzel_Decorative'] text-2xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.6)] animate-shimmer">
           {pad(timeLeft.minutes)}
         </span>
-        <span className="text-[10px] sm:text-sm uppercase tracking-[0.2em] text-amber-200/80 font-medium mt-1">
+        <span className="text-[9px] sm:text-sm uppercase tracking-[0.12em] sm:tracking-[0.2em] text-amber-200/80 font-semibold mt-0.5 sm:mt-1">
           Minutes
         </span>
       </div>
 
-      <div className="h-10 w-px bg-gradient-to-b from-transparent via-amber-400/50 to-transparent"></div>
+      <div className="h-7 sm:h-10 w-px bg-gradient-to-b from-transparent via-amber-400/50 to-transparent"></div>
 
       {/* Seconds */}
-      <div className="flex flex-col items-center min-w-[50px] sm:min-w-[70px]">
-        <span className="font-['Cinzel_Decorative'] text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider animate-heartbeat-glow">
+      <div className="flex flex-col items-center min-w-[44px] sm:min-w-[70px]">
+        <span className="font-['Cinzel_Decorative'] text-2xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#fde047] via-[#d97706] to-[#fde047] tracking-wider animate-heartbeat-glow">
           {pad(timeLeft.seconds)}
         </span>
-        <span className="text-[10px] sm:text-sm uppercase tracking-[0.2em] text-amber-200/80 font-medium mt-1">
+        <span className="text-[9px] sm:text-sm uppercase tracking-[0.12em] sm:tracking-[0.2em] text-amber-200/80 font-semibold mt-0.5 sm:mt-1">
           Seconds
         </span>
       </div>

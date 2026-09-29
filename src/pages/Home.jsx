@@ -2041,98 +2041,109 @@ export default function Home() {
       {/* --------------------------------------------------------------------- */}
       {/* 1. HERO SECTION                                                       */}
       {/* --------------------------------------------------------------------- */}
-      <section className="relative min-h-[92vh] flex items-center justify-center pt-24 pb-0 overflow-hidden bg-[#050614]">
-        {/* Hero Background Image Layer */}
+      {/* --------------------------------------------------------------------- */}
+      {/* 1. HERO SECTION                                                       */}
+      {/* --------------------------------------------------------------------- */}
+      <section className="relative min-h-[100dvh] sm:min-h-[92vh] flex items-center justify-center pt-20 sm:pt-28 pb-12 sm:pb-0 overflow-hidden bg-[#050614]">
+        {/* Hero Background Image Layer - Covers seamlessly on mobile, contain/cover on desktop */}
         <div
-          className="absolute inset-0 bg-contain bg-top bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center sm:bg-contain sm:bg-top bg-no-repeat transition-all"
           style={{ backgroundImage: `url(${heroBg})` }}
         ></div>
 
-        {/* Gradient Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050614]/90 via-[#050614]/50 to-transparent w-full lg:w-[70%]"></div>
+        {/* Ambient Gradient Overlays for Readability and Seamless Bottom Blending */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050614]/85 via-[#050614]/65 to-[#050614] sm:bg-gradient-to-r sm:from-[#050614]/95 sm:via-[#050614]/60 sm:to-transparent w-full lg:w-[70%]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(229,179,47,0.18)_0%,transparent_70%)] pointer-events-none"></div>
 
         {/* Floating Sparks */}
         <FestiveParticles count={30} />
 
-        <div className="relative z-10 w-full px-6 sm:px-12 lg:px-24 pt-6 flex flex-col lg:flex-row items-center">
-          <div className="flex flex-col items-start text-left space-y-6 w-full lg:w-1/2">
+        <div className="relative z-10 w-full px-4 sm:px-12 lg:px-24 pt-2 sm:pt-6 flex flex-col lg:flex-row items-center">
+          <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-4 sm:space-y-6 w-full lg:w-1/2 max-w-xl mx-auto sm:mx-0">
+
+            {/* Festive Eyebrow Pill */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1e153b]/90 border border-[#e5b32f]/40 text-[#ffe58f] text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-gold-glow animate-pulse-slow">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>DIWALI DHAMAKA 2026 • OFFICIAL LUCKY DRAW</span>
+            </div>
 
             {/* Main Title & Subtitle */}
-            <div className="space-y-3 relative z-10">
+            <div className="space-y-1 sm:space-y-2 relative z-10 w-full">
               {/* Soft glow behind the text to make it pop */}
-              <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,rgba(229,179,47,0.12)_0%,transparent_60%)] pointer-events-none blur-2xl -z-10"></div>
+              <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,rgba(229,179,47,0.15)_0%,transparent_60%)] pointer-events-none blur-2xl -z-10"></div>
 
-              <h1 className="font-serif italic text-5xl sm:text-7xl md:text-[6.5rem] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-[#ffffff] via-[#facc15] to-[#b45309] drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)] leading-[1.1] pb-2">
+              <h1 className="font-serif italic text-4xl xs:text-5xl sm:text-7xl md:text-[6.5rem] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-[#ffffff] via-[#facc15] to-[#b45309] drop-shadow-[0_8px_20px_rgba(0,0,0,0.9)] leading-[1.08] pb-1">
                 Diwali
                 <br />
                 Dhamaka
               </h1>
 
-              <div className="pt-0 pb-4">
+              <div className="pt-0 pb-1 sm:pb-3 flex justify-center sm:justify-start">
                 <img
                   src={luckyDrawImg}
                   alt="Lucky Draw"
-                  className="w-auto h-20 sm:h-28 md:h-36 object-contain animate-ribbon-float drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
+                  className="w-auto h-16 xs:h-20 sm:h-28 md:h-36 object-contain animate-ribbon-float drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
                 />
               </div>
 
-
+              {/* Mobile Countdown Timer (Integrated into flow, so it NEVER overlaps buttons!) */}
+              <div className="lg:hidden w-full flex flex-col items-center justify-center my-3">
+                <div className="w-full flex justify-center">
+                  <CountdownTimer targetDate={draw.scheduledAt} />
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-amber-300/80 mt-1.5 flex items-center gap-1">
+                  <Calendar className="w-3 h-3 text-amber-400" />
+                  <span>Grand Draw: {draw.displayDate} • {draw.displayTime}</span>
+                </span>
+              </div>
             </div>
 
-
             {/* Action CTAs */}
-            <div className="-mt-2 flex flex-col sm:flex-row items-center justify-start gap-4 pt-0 w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-start gap-3 sm:gap-4 pt-1 sm:pt-0 w-full">
               <Link
                 to="/participate"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full font-bold text-sm sm:text-base text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:shadow-[0_0_35px_rgba(229,179,47,0.75)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-7 sm:px-8 py-3.5 rounded-full font-bold text-sm sm:text-base text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:shadow-[0_0_35px_rgba(229,179,47,0.75)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 group"
               >
-                <img src={giftImg} alt="Gift" className="w-8 h-8 sm:w-9 sm:h-9 object-contain animate-gift-tada group-hover:scale-125 transition-transform duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                <img src={giftImg} alt="Gift" className="w-7 h-7 sm:w-8 sm:h-8 object-contain animate-gift-tada group-hover:scale-125 transition-transform duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
                 <span>ENTER LUCKY DRAW</span>
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
               </Link>
 
               <Link
                 to="/prizes"
-                className="group relative overflow-hidden w-full sm:w-auto px-7 py-3.5 rounded-full font-bold text-sm sm:text-base text-[#fcf8f0] bg-[#141633]/80 border border-amber-400/40 backdrop-blur-md shadow-[inset_0_0_15px_rgba(245,158,11,0.1)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:border-amber-400 transition-all duration-300 flex items-center justify-center gap-2"
+                className="group relative overflow-hidden w-full sm:w-auto px-6 sm:px-7 py-3.5 rounded-full font-bold text-sm sm:text-base text-[#fcf8f0] bg-[#141633]/85 border border-amber-400/40 backdrop-blur-md shadow-[inset_0_0_15px_rgba(245,158,11,0.1)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:border-amber-400 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                {/* Impressive Sweeping Glare Animation */}
                 <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-transparent via-amber-200/30 to-transparent animate-button-sweep"></div>
-
+                <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 relative z-10" />
                 <span className="relative z-10 group-hover:text-amber-300 transition-colors duration-300 tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">VIEW PRIZES</span>
-                <ChevronRight className="w-5 h-5 relative z-10 group-hover:text-amber-300 group-hover:translate-x-1 transition-all duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:text-amber-300 group-hover:translate-x-1 transition-all duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
               </Link>
             </div>
 
             {/* Trust Badge */}
-            <div className="-mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-white/75">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-2 sm:gap-6 text-xs sm:text-sm text-white/75 w-full pt-1">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
                 <span>Safe & Secure Participation</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+              <div className="flex items-center gap-1.5">
+                <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
                 <span>Transparent Certified Random Draw</span>
               </div>
             </div>
           </div>
 
-          {/* Right side placeholder to keep left side constrained */}
+          {/* Right side desktop spacer */}
           <div className="hidden lg:block lg:w-1/2"></div>
         </div>
 
-        {/* Countdown Timer positioned at exactly 70% across the screen */}
-        <div className="hidden lg:block absolute bottom-4 left-[65%] -translate-x-1/2 z-20 pointer-events-none animate-ribbon-float">
-          <div className="pointer-events-auto scale-[0.8] sm:scale-70 origin-bottom">
+        {/* Desktop Countdown Timer (positioned at 65% across screen, only on large displays) */}
+        <div className="hidden lg:block absolute bottom-6 left-[65%] -translate-x-1/2 z-20 pointer-events-none animate-ribbon-float">
+          <div className="pointer-events-auto scale-[0.85] origin-bottom">
             <CountdownTimer targetDate={draw.scheduledAt} />
           </div>
         </div>
-
-        {/* Mobile Countdown Timer fallback (centered) */}
-        <div className="lg:hidden absolute bottom-4 left-0 right-0 flex justify-center w-full z-20 pointer-events-none animate-ribbon-float">
-          <div className="pointer-events-auto scale-[0.8] sm:scale-90 origin-bottom">
-            <CountdownTimer targetDate={draw.scheduledAt} />
-          </div>
-        </div>      </section>
+      </section>
 
       {/* --------------------------------------------------------------------- */}
       {/* 2. ABOUT THE LUCKY DRAW (Celebrate the Festival of Lights)             */}
