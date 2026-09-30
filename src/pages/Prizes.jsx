@@ -124,10 +124,18 @@ export default function Prizes() {
   useEffect(() => {
     async function loadPrizes() {
       try {
-        const res = await api.getPrizes();
-        if (res.success) {
-          setPrizes(res.data);
-        }
+        setPrizes([
+          { id: 1, amount: '₹1,00,000', description: 'Mega Jackpot Prize' },
+          { id: 2, amount: '₹50,000', description: 'First Runner Up' },
+          { id: 3, amount: '₹25,000', description: 'Second Runner Up' },
+          { id: 4, amount: '₹10,000', description: 'Special Reward' },
+          { id: 5, amount: '₹5,000', description: 'Diwali Star' },
+          { id: 6, amount: '₹2,500', description: 'Lucky Winner' },
+          { id: 7, amount: '₹1,000', description: 'SparkFest Pack' },
+          { id: 8, amount: '₹500', description: 'Golden Ticket' },
+          { id: 9, amount: '₹250', description: 'Silver Jubilee' },
+          { id: 10, amount: '₹100', description: 'Bronze Reward' }
+        ]);
       } catch (err) {
         console.error('Failed to load prizes:', err);
       } finally {
@@ -307,3 +315,4 @@ export default function Prizes() {
     </div>
   );
 }
+

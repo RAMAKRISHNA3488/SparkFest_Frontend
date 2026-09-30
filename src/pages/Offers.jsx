@@ -14,10 +14,32 @@ export default function Offers() {
   useEffect(() => {
     async function loadOffers() {
       try {
-        const res = await api.getOffers();
-        if (res.success) {
-          setOffers(res.data);
-        }
+        setOffers([
+          {
+            id: 1,
+            title: 'Early Bird Special',
+            subtitle: 'Buy 2 Get 1 Free',
+            description: 'Purchase your tickets before the festival begins and get an extra ticket absolutely free.',
+            ctaText: 'CLAIM OFFER',
+            ctaLink: '/participate'
+          },
+          {
+            id: 2,
+            title: 'Festive Combo',
+            subtitle: '5 Tickets Pack',
+            description: 'Maximize your chances with our special Diwali combo pack at a discounted price.',
+            ctaText: 'GET COMBO',
+            ctaLink: '/participate'
+          },
+          {
+            id: 3,
+            title: 'Golden Ticket',
+            subtitle: 'VIP Access',
+            description: 'Exclusive access to premium draws and guaranteed smaller rewards.',
+            ctaText: 'GO VIP',
+            ctaLink: '/participate'
+          }
+        ]);
       } catch (err) {
         console.error('Failed to load offers:', err);
       } finally {
