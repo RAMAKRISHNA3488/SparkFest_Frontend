@@ -43,7 +43,7 @@ import WinnerAnnouncementModal from '../components/common/WinnerAnnouncementModa
 import { api } from '../services/api';
 import loginBgImage from '../../Images/Midnight Blue-Gold Light Waves.png';
 import winnersPageBg from '../../Images/winners-page-bg.png';
-import premiumSpinsBg from '../../Images/premium_spins_bg.jpg';
+import grandPrizesBg from '../../Images/grand-prizes-bg.png';
 import adminIconUsers from '../../Images/admin_icon_users.jpg';
 import adminIcon10rs from '../../Images/admin_icon_10rs.jpg';
 import adminIcon30rs from '../../Images/admin_icon_30rs.jpg';
@@ -1002,21 +1002,25 @@ export default function AdminDashboard() {
   // =========================================================================
   // VIEW 2: LOGGED-IN ADMIN CONSOLE (ONLY ONE ITEM IN THE MENU)
   // Exactly requested fields: s.no, full name, mobile number, gmail, location, tocken, plan, data
-  // =========================================================================
   return (
-    <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed antialiased"
-      style={{ backgroundImage: `url('${winnersPageBg}')`, fontFamily: "'Outfit', 'Inter', system-ui, sans-serif" }}
-    >
+    <div className="min-h-screen relative antialiased pt-28 pb-20 overflow-hidden">
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
-          * { font-family: 'Outfit', sans-serif; }
-          .font-serif { font-family: 'Outfit', sans-serif !important; }
+          @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500;600;700&display=swap');
+          .premium-font { font-family: 'Cinzel', serif !important; }
+          .premium-text { font-family: 'Playfair Display', serif !important; }
+          .normal-font { font-family: 'Inter', sans-serif !important; }
         `}
       </style>
-      <div className="min-h-screen bg-black/60 backdrop-blur-sm">
-        <div className="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      {/* Background starting below navbar (approx 80px top) */}
+      <div 
+        className="fixed inset-x-0 bottom-0 top-[80px] bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('${winnersPageBg}')`, zIndex: 0 }}
+      />
+      <div className="fixed inset-x-0 bottom-0 top-[80px] bg-black/65 backdrop-blur-md" style={{ zIndex: 1 }} />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 premium-text">
 
       {/* Top Header Bar */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 sm:p-7 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden group hover:border-[#e5b32f]/40 transition-all duration-500">
@@ -1028,10 +1032,10 @@ export default function AdminDashboard() {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>2FA Authenticated • Administrator Console</span>
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#aa8010] drop-shadow-lg">
+          <h1 className="premium-font text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#aa8010] drop-shadow-lg tracking-wide">
             Diwali Dhamaka Operations
           </h1>
-          <p className="text-sm font-medium text-white/70">
+          <p className="text-base font-medium text-white/80 premium-text italic">
             Real-time verified participants, tokens, and plan bookings repository.
           </p>
         </div>
@@ -1087,20 +1091,20 @@ export default function AdminDashboard() {
           3. Total Number of 30rs Plans
           4. Total Number of 50rs Plans
           ========================================================================= */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1 relative z-10">
           <div>
-            <h2 className="text-sm uppercase tracking-widest font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 flex items-center gap-2 drop-shadow-md">
-              <TrendingUp className="w-4 h-4 text-amber-400" />
+            <h2 className="premium-font text-lg uppercase tracking-widest font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 flex items-center gap-2 drop-shadow-md">
+              <TrendingUp className="w-5 h-5 text-amber-400" />
               <span>Real-Time Plan Analytics & Key Metrics</span>
             </h2>
-            <p className="text-xs text-white/60 mt-1 font-medium">
+            <p className="premium-text text-sm text-white/70 mt-1 font-medium italic">
               Interactive feature cards: Click any card to filter participants table below.
             </p>
           </div>
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-black/50 backdrop-blur-md border border-[#e5b32f]/50 text-sm text-[#ffe58f] font-mono shadow-[0_0_20px_rgba(229,179,47,0.3)] hover:scale-105 transition-transform duration-300">
-            <img src={adminIconRevenue} alt="Revenue" className="w-7 h-7 rounded-full object-cover shadow-[0_0_10px_rgba(229,179,47,0.8)]" />
-            <span className="font-semibold uppercase tracking-wider">Total Collection: <strong className="text-white text-lg ml-1">₹{planCounts.totalRevenue.toLocaleString()}</strong></span>
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-[#e5b32f]/60 text-base text-[#ffe58f] shadow-[0_0_25px_rgba(229,179,47,0.35)] hover:scale-105 transition-transform duration-300">
+            <img src={adminIconRevenue} alt="Revenue" className="w-8 h-8 rounded-full object-cover shadow-[0_0_15px_rgba(229,179,47,0.9)]" />
+            <span className="premium-font font-bold uppercase tracking-wider">Total Collection: <strong className="text-white text-xl ml-2">₹{planCounts.totalRevenue.toLocaleString()}</strong></span>
           </div>
         </div>
 
@@ -1368,9 +1372,8 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* CORE REGISTRATIONS TABLE */}
-      {/* Exactly requested columns: s.no, full name, mobile number, gmail, location, tocken, plan(like 10rs or 30rs like), data */}
-      <div className="rounded-3xl bg-[#141634] border border-[#e5b32f]/20 shadow-2xl overflow-hidden">
+      {/* CORE REGISTRATIONS TABLE (Normal font) */}
+      <div className="normal-font rounded-3xl bg-[#141634] border border-[#e5b32f]/20 shadow-2xl overflow-hidden mt-6">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -1585,61 +1588,61 @@ export default function AdminDashboard() {
         {/* LOCKED STATE: Displayed when it is NOT Diwali Day and Admin Simulation is OFF */}
         {!isSpinEnabled && (
           <div 
-            className="p-8 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-amber-500/40 group hover:border-amber-400/60 transition-all duration-700 bg-cover bg-center"
-            style={{ backgroundImage: `url('${premiumSpinsBg}')` }}
+            className="p-8 sm:p-14 rounded-[3rem] text-center relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-amber-500/40 group hover:border-amber-400/60 transition-all duration-700 bg-cover bg-center"
+            style={{ backgroundImage: `url('${grandPrizesBg}')` }}
           >
             {/* Dark glass overlay to make text readable over the background */}
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-md group-hover:bg-black/40 transition-all duration-700" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-md group-hover:bg-black/50 transition-all duration-700" />
             
-            <div className="max-w-xl mx-auto space-y-8 relative z-10">
+            <div className="max-w-2xl mx-auto space-y-10 relative z-10">
               {/* Premium Lock Icon */}
-              <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-tr from-amber-500/30 to-purple-600/30 border border-amber-300/50 mx-auto flex items-center justify-center text-amber-300 shadow-[0_0_40px_rgba(245,158,11,0.4)] backdrop-blur-xl group-hover:scale-110 group-hover:shadow-[0_0_60px_rgba(245,158,11,0.6)] transition-all duration-500">
-                <Lock className="w-12 h-12" />
+              <div className="w-28 h-28 rounded-[2.5rem] bg-gradient-to-tr from-amber-500/30 to-purple-600/30 border border-amber-300/50 mx-auto flex items-center justify-center text-amber-300 shadow-[0_0_50px_rgba(245,158,11,0.5)] backdrop-blur-xl group-hover:scale-110 group-hover:shadow-[0_0_70px_rgba(245,158,11,0.7)] transition-all duration-500">
+                <Lock className="w-14 h-14" />
               </div>
 
-              <div className="space-y-3">
-                <h3 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-600 drop-shadow-2xl uppercase tracking-wider">
+              <div className="space-y-4">
+                <h3 className="premium-font text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-600 drop-shadow-2xl uppercase tracking-widest">
                   Spins Locked Until Diwali Day
                 </h3>
-                <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
+                <p className="premium-text text-base sm:text-xl text-white/90 leading-relaxed font-medium italic">
                   The <strong className="text-amber-300 drop-shadow-md">₹10 Spin</strong>, <strong className="text-purple-300 drop-shadow-md">₹30 Spin</strong>, and <strong className="text-emerald-300 drop-shadow-md">₹50 Spin</strong> features will unlock and become operational only on Diwali Day for all verified ticket holders.
                 </p>
               </div>
 
               {/* Countdown Timer to Diwali Day */}
-              <div className="p-5 rounded-[2rem] bg-black/60 backdrop-blur-2xl border border-white/20 max-w-md mx-auto space-y-3 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                <span className="text-xs uppercase font-extrabold tracking-widest text-amber-400 flex items-center justify-center gap-2 drop-shadow-md">
-                  <Clock className="w-4 h-4" />
+              <div className="p-6 rounded-[2.5rem] bg-black/70 backdrop-blur-3xl border border-white/20 max-w-lg mx-auto space-y-4 shadow-[0_0_40px_rgba(0,0,0,0.6)]">
+                <span className="premium-font text-sm uppercase font-extrabold tracking-widest text-amber-400 flex items-center justify-center gap-3 drop-shadow-md">
+                  <Clock className="w-5 h-5" />
                   <span>Countdown to Festival</span>
                 </span>
-                <div className="grid grid-cols-4 gap-3 text-center pt-2">
-                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
-                    <span className="font-mono text-2xl sm:text-3xl font-black text-amber-400 block drop-shadow-lg">{diwaliCountdown.days}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Days</span>
+                <div className="grid grid-cols-4 gap-4 text-center pt-2">
+                  <div className="p-4 rounded-3xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/40 transition-colors duration-500">
+                    <span className="font-mono text-3xl sm:text-4xl font-black text-amber-400 block drop-shadow-lg">{diwaliCountdown.days}</span>
+                    <span className="premium-font text-xs font-bold uppercase tracking-widest text-white/60 mt-2 block">Days</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
-                    <span className="font-mono text-2xl sm:text-3xl font-black text-white block drop-shadow-lg">{diwaliCountdown.hours}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Hours</span>
+                  <div className="p-4 rounded-3xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/40 transition-colors duration-500">
+                    <span className="font-mono text-3xl sm:text-4xl font-black text-white block drop-shadow-lg">{diwaliCountdown.hours}</span>
+                    <span className="premium-font text-xs font-bold uppercase tracking-widest text-white/60 mt-2 block">Hours</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
-                    <span className="font-mono text-2xl sm:text-3xl font-black text-white block drop-shadow-lg">{diwaliCountdown.minutes}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Mins</span>
+                  <div className="p-4 rounded-3xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/40 transition-colors duration-500">
+                    <span className="font-mono text-3xl sm:text-4xl font-black text-white block drop-shadow-lg">{diwaliCountdown.minutes}</span>
+                    <span className="premium-font text-xs font-bold uppercase tracking-widest text-white/60 mt-2 block">Mins</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
-                    <span className="font-mono text-2xl sm:text-3xl font-black text-white block drop-shadow-lg">{diwaliCountdown.seconds}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Secs</span>
+                  <div className="p-4 rounded-3xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/40 transition-colors duration-500">
+                    <span className="font-mono text-3xl sm:text-4xl font-black text-white block drop-shadow-lg">{diwaliCountdown.seconds}</span>
+                    <span className="premium-font text-xs font-bold uppercase tracking-widest text-white/60 mt-2 block">Secs</span>
                   </div>
                 </div>
               </div>
 
               {/* Admin Test Unlock CTA */}
-              <div className="pt-2">
+              <div className="pt-4">
                 <button
                   type="button"
                   onClick={() => setIsDiwaliDayMode(true)}
-                  className="px-8 py-4 rounded-full text-sm font-extrabold uppercase tracking-widest bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-[#0b0d1e] shadow-[0_0_30px_rgba(245,158,11,0.5)] hover:shadow-[0_0_50px_rgba(245,158,11,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer inline-flex items-center gap-3"
+                  className="premium-font px-10 py-5 rounded-full text-base font-extrabold uppercase tracking-widest bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-[#0b0d1e] shadow-[0_0_40px_rgba(245,158,11,0.6)] hover:shadow-[0_0_60px_rgba(245,158,11,0.9)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer inline-flex items-center gap-3"
                 >
-                  <Unlock className="w-5 h-5" />
+                  <Unlock className="w-6 h-6" />
                   <span>Unlock & Test Diwali Spins (Override)</span>
                 </button>
               </div>
@@ -1861,6 +1864,5 @@ export default function AdminDashboard() {
       )}
       </div>
     </div>
-  </div>
   );
 }
