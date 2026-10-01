@@ -49,9 +49,6 @@ import adminIcon10rs from '../../Images/admin_icon_10rs.jpg';
 import adminIcon30rs from '../../Images/admin_icon_30rs.jpg';
 import adminIcon50rs from '../../Images/admin_icon_50rs.jpg';
 import adminIconRevenue from '../../Images/admin_icon_revenue.jpg';
-import adminIcon30rs from '../../Images/admin_icon_30rs.jpg';
-import adminIcon50rs from '../../Images/admin_icon_50rs.jpg';
-import adminIconRevenue from '../../Images/admin_icon_revenue.jpg';
 // Verified sample dataset adhering strictly to requested fields:
 // S.No, Full Name, Mobile Number, Gmail, Location, Tocken, Plan (like 10rs or 30rs like), Data
 const DEFAULT_REGISTRATIONS = [
