@@ -781,7 +781,7 @@ export default function AdminDashboard() {
                     required
                     value={credentials.email}
                     onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                    placeholder="kirankumamoopuri@gmail.com"
+                    placeholder="administrator@hq.diwalidhamaka.com"
                     className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[#141535] border border-[#2a2b5a] text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#e5b32f] transition-colors"
                   />
                 </div>
