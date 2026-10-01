@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    // Inline assets up to 1.5MB to ensure instant rendering without network loading waterfalls
+    assetsInlineLimit: 1500000 
+  },
   server: {
     port: 5173,
     proxy: {
