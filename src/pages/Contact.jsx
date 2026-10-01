@@ -527,7 +527,7 @@ export default function Contact() {
                             Official Support Email
                           </div>
                           <div className="text-[11px] sm:text-xs font-semibold text-white/95 group-hover/item:text-[#ffe58f] transition-colors break-all">
-                            support@diwalidhamaka.com
+                            support@viswasluckydraw.com
                           </div>
                         </div>
                       </div>
@@ -535,7 +535,7 @@ export default function Contact() {
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
-                          onClick={() => copyToClipboard('support@diwalidhamaka.com', 'Email', 'email')}
+                          onClick={() => copyToClipboard('support@viswasluckydraw.com', 'Email', 'email')}
                           className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider transition-all flex items-center gap-1 active:scale-95 cursor-pointer ${
                             copiedKey === 'email'
                               ? 'bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 shadow-sm'
@@ -556,7 +556,7 @@ export default function Contact() {
                           )}
                         </button>
                         <a
-                          href="mailto:support@diwalidhamaka.com?subject=Diwali%20Dhamaka%20Support%20Inquiry"
+                          href="mailto:support@viswasluckydraw.com?subject=Diwali%20Dhamaka%20Support%20Inquiry"
                           className="px-3 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/35 border border-amber-400/50 hover:border-amber-300 text-[#ffe58f] text-[10px] font-bold tracking-wider transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
                         >
                           <span>Mail</span>
@@ -581,7 +581,7 @@ export default function Contact() {
                             WhatsApp VIP Concierge
                           </div>
                           <div className="text-xs sm:text-sm font-semibold text-white/95 font-mono tracking-wider group-hover/item:text-[#ffe58f] transition-colors truncate">
-                            +91 98000 20260
+                            +91 98665 31383
                           </div>
                         </div>
                       </div>
@@ -589,7 +589,7 @@ export default function Contact() {
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
-                          onClick={() => copyToClipboard('+91 98000 20260', 'WhatsApp Number', 'whatsapp')}
+                          onClick={() => copyToClipboard('+91 98665 31383', 'WhatsApp Number', 'whatsapp')}
                           className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider transition-all flex items-center gap-1 active:scale-95 cursor-pointer ${
                             copiedKey === 'whatsapp'
                               ? 'bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 shadow-sm'
@@ -610,7 +610,7 @@ export default function Contact() {
                           )}
                         </button>
                         <a
-                          href="https://wa.me/919800020260?text=Hello%20Diwali%20Dhamaka%20Support%2C%20I%20have%20an%20inquiry%20regarding%20my%20participation."
+                          href="https://wa.me/919866531383?text=Hello%20Diwali%20Dhamaka%20Support%2C%20I%20have%20an%20inquiry%20regarding%20my%20participation."
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 text-[10px] font-bold tracking-wider transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"

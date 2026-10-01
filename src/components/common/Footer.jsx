@@ -104,11 +104,11 @@ export default function Footer() {
             </h4>
             <ul className="space-y-4 text-sm text-[#fcf8f0]/70 mt-2">
               <li className="group">
-                <a href="mailto:support@diwalidhamaka.com" className="flex items-start gap-3 transition-all duration-300 transform group-hover:translate-x-1.5 hover:text-[#ffe58f]">
+                <a href="mailto:support@viswasluckydraw.com" className="flex items-start gap-3 transition-all duration-300 transform group-hover:translate-x-1.5 hover:text-[#ffe58f]">
                   <div className="w-6 h-6 rounded bg-[#181a38] border border-[#e5b32f]/30 flex items-center justify-center shrink-0 group-hover:border-[#e5b32f] group-hover:shadow-[0_0_8px_rgba(229,179,47,0.3)] transition-all">
                     <Mail className="w-3 h-3 text-[#e5b32f]" />
                   </div>
-                  <span className="mt-0.5 break-all">support@diwalidhamaka.com</span>
+                  <span className="mt-0.5 break-all">support@viswasluckydraw.com</span>
                 </a>
               </li>
               <li className="group">
