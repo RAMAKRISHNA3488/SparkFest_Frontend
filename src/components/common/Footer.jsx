@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { api } from '../../services/api';
 import deepamImg from '../../assets/Deepam.png';
 import { Flame, ShieldCheck, Mail, Phone, Clock, Heart, Award, Users, Send, CheckCircle2 } from 'lucide-react';
 
@@ -12,13 +13,28 @@ const Linkedin = ({ className }) => <svg viewBox="0 0 24 24" fill="currentColor"
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
-    if (email.trim() !== '') {
+    if (!email.trim() || loading) return;
+    
+    setLoading(true);
+    try {
+      await api.submitContact({
+        name: 'Newsletter Subscriber',
+        email: email.trim(),
+        subject: 'Newsletter Subscription',
+        message: 'Please subscribe me to your newsletter.'
+      });
       setSubscribed(true);
       setTimeout(() => setSubscribed(false), 5000); // Reset after 5s
       setEmail('');
+    } catch (error) {
+      console.error('Subscription failed:', error);
+      // Optional: Handle error UI here, falling back to basic experience for now
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -184,15 +200,26 @@ export default function Footer() {
               <form onSubmit={handleSubscribe} className="relative group">
                 <input 
                   type="email" 
+                  id="newsletter-email"
+                  name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email address" 
                   required
-                  className="w-full bg-[#12142d] border border-[#e5b32f]/20 rounded-full py-3.5 pl-5 pr-[110px] text-[13px] text-white focus:outline-none focus:border-[#e5b32f]/60 focus:bg-[#181a38] transition-all"
+                  disabled={loading}
+                  className="w-full bg-[#12142d] border border-[#e5b32f]/20 rounded-full py-3.5 pl-5 pr-[110px] text-[13px] text-white focus:outline-none focus:border-[#e5b32f]/60 focus:bg-[#181a38] transition-all disabled:opacity-70"
                 />
-                <button type="submit" className="absolute right-1.5 top-1.5 bottom-1.5 bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] text-[#0b0d1e] font-bold text-[13px] px-4 rounded-full flex items-center gap-2 hover:shadow-[0_0_15px_rgba(229,179,47,0.5)] hover:scale-105 active:scale-95 transition-all">
-                  <Send className="w-3.5 h-3.5 -ml-1" />
-                  Subscribe
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="absolute right-1.5 top-1.5 bottom-1.5 bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] text-[#0b0d1e] font-bold text-[13px] px-4 rounded-full flex items-center gap-2 hover:shadow-[0_0_15px_rgba(229,179,47,0.5)] hover:scale-105 active:scale-95 transition-all disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <span className="w-4 h-4 border-2 border-[#0b0d1e]/30 border-t-[#0b0d1e] rounded-full animate-spin"></span>
+                  ) : (
+                    <Send className="w-3.5 h-3.5 -ml-1" />
+                  )}
+                  {loading ? 'Subscribing...' : 'Subscribe'}
                 </button>
               </form>
             )}

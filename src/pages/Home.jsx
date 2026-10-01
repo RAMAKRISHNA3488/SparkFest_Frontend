@@ -2329,15 +2329,14 @@ export default function Home() {
       {/* --------------------------------------------------------------------- */}
       <section
         id="how-it-works"
-        className="relative w-full overflow-hidden aspect-[1917/861] min-h-fit py-10 sm:py-12 lg:py-0 flex items-center justify-center"
-        style={{ aspectRatio: '1917 / 861' }}
+        className="relative w-full overflow-hidden lg:aspect-[1917/861] min-h-fit py-16 lg:py-0 flex items-center justify-center"
       >
         <img
           src={howItWorksBg}
           alt="How It Works Background"
           className="absolute inset-0 w-full h-full pointer-events-none select-none"
           style={{
-            objectFit: 'fill'
+            objectFit: 'cover'
           }}
         />
 
@@ -2440,7 +2439,7 @@ export default function Home() {
           </p>
 
           {/* 4 Step Cards in One Row with 3 Circular Arrow Connectors */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-5.5 mt-8 sm:mt-10 lg:mt-12 w-full max-w-[1240px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-6 lg:gap-4 xl:gap-5.5 mt-10 sm:mt-10 lg:mt-12 w-full max-w-[1240px]">
             {howItWorksSteps.map((step, idx) => (
               <div
                 key={step.num}

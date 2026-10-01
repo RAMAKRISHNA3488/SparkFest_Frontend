@@ -1,33 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, Search, ChevronDown, Sparkles } from 'lucide-react';
 import { api } from '../services/api';
-import contactPageBg from '../../Images/contact-page-bg.png';
+import howItWorksBg from '../../Images/how-it-works-background.png';
 
 export default function FAQ() {
   const [faqs, setFaqs] = useState([]);
-  const [categories, setCategories] = useState(['All']);
+  const [categories, setCategories] = useState(['All', 'General', 'Participation', 'Prizes & Rewards', 'Delivery & Security']);
   const [selectedCat, setSelectedCat] = useState('General');
   const [search, setSearch] = useState('');
   const [activeFaq, setActiveFaq] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadFaqs() {
-      try {
-        const res = await api.getFaqs({ category: selectedCat, search });
-        if (res.success) {
-          setFaqs(res.data);
-          if (res.categories && res.categories.length > 0) {
-            setCategories(res.categories);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load FAQs:', err);
-      } finally {
-        setLoading(false);
+    const allFaqs = [
+      {
+        id: 1,
+        category: 'General',
+        question: 'What is SparkFest Diwali Dhamaka?',
+        answer: 'SparkFest Diwali Dhamaka is our exclusive annual lucky draw event offering participants a chance to win premium cracker hampers and exclusive rewards to brighten their Diwali celebrations.'
+      },
+      {
+        id: 2,
+        category: 'General',
+        question: 'How do I participate in the lucky draw?',
+        answer: 'Simply register on our platform, verify your mobile number, and purchase an entry ticket. Each ticket grants you a unique number for the upcoming live draw.'
+      },
+
+      {
+        id: 12,
+        category: 'General',
+        question: 'Are there any entry fees hidden beyond the ticket price?',
+        answer: 'No, the ticket price is absolutely final. We believe in complete transparency, and there are no hidden charges or processing fees at any stage.'
+      },
+      {
+        id: 3,
+        category: 'Participation',
+        question: 'Can I purchase multiple tickets?',
+        answer: 'Yes! You can purchase multiple tickets to increase your chances of winning. There is no limit to the number of entries a single participant can have.'
+      },
+      {
+        id: 4,
+        category: 'Participation',
+        question: 'Is my ticket transferrable to someone else?',
+        answer: 'No, tickets are strictly non-transferable and are tied to the registered mobile number and identity of the purchaser to ensure absolute fairness.'
+      },
+      {
+        id: 5,
+        category: 'Prizes & Rewards',
+        question: 'How are the winners selected in the live draw?',
+        answer: 'Winners are selected through a completely transparent, verified random draw system that is broadcasted live on our platform to ensure fairness for all participants.'
+      },
+      {
+        id: 6,
+        category: 'Prizes & Rewards',
+        question: 'Are the prize amounts refundable or exchangeable?',
+        answer: 'No, all prize amounts are strictly non-refundable. Once a winning ticket is confirmed and verified, the awarded prize value is final and cannot be cancelled or exchanged.'
+      },
+      {
+        id: 7,
+        category: 'Prizes & Rewards',
+        question: 'How will I be notified if I win?',
+        answer: 'Winner notifications and secure delivery tracking links are sent instantly via SMS and email to the registered contact details immediately upon the completion of the live draw.'
+      },
+      {
+        id: 8,
+        category: 'Delivery & Security',
+        question: 'What do I need to provide for delivery verification?',
+        answer: 'Winners must provide a valid government-recognized ID (Aadhaar/PAN) for identity and delivery verification before physical cracker gifts are dispatched.'
+      },
+      {
+        id: 9,
+        category: 'Delivery & Security',
+        question: 'How safe is the delivery of crackers?',
+        answer: 'All cracker deliveries are fully insured and handled safely by our certified logistics partners, strictly following necessary safety precautions and local regulations.'
+      },
+      {
+        id: 10,
+        category: 'Delivery & Security',
+        question: 'Is my payment information secure?',
+        answer: 'Absolutely. We use bank-grade 256-bit encryption and partner with industry-leading payment gateways. We never store your raw credit card or UPI details on our servers.'
       }
+    ];
+
+    let filtered = allFaqs;
+    
+    if (selectedCat !== 'All') {
+      filtered = filtered.filter(f => f.category === selectedCat);
     }
-    loadFaqs();
+    
+    if (search.trim()) {
+      const s = search.toLowerCase();
+      filtered = filtered.filter(f => 
+        f.question.toLowerCase().includes(s) || 
+        f.answer.toLowerCase().includes(s)
+      );
+    }
+
+    setFaqs(filtered);
+    setLoading(false);
   }, [selectedCat, search]);
 
   return (
@@ -35,10 +105,10 @@ export default function FAQ() {
       <div
         className="w-full flex flex-col justify-start overflow-x-hidden pb-10"
         style={{
-          backgroundImage: `url(${contactPageBg})`,
-          backgroundSize: '100% 100%',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundImage: `url(${howItWorksBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'repeat-y'
         }}
       >
         <div className="pt-6 sm:pt-8 lg:pt-10 pb-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-start flex-1 mb-0">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Trophy, Search, Filter, Sparkles, CheckCircle, Calendar, MapPin, ChevronLeft, ChevronRight, Crown, Award, Medal, Gift, Ticket, ShieldCheck } from 'lucide-react';
 import { api } from '../services/api';
@@ -179,6 +179,19 @@ export default function Winners() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+
+  const TIER_ORDER = ['all', 'gold', 'silver', 'bronze', 'purple'];
+
+  const handleMobileTabNavigation = (direction) => {
+    const currentIndex = TIER_ORDER.indexOf(selectedTier);
+    if (direction === 'left') {
+      const nextIndex = currentIndex === 0 ? TIER_ORDER.length - 1 : currentIndex - 1;
+      setSelectedTier(TIER_ORDER[nextIndex]);
+    } else {
+      const nextIndex = currentIndex === TIER_ORDER.length - 1 ? 0 : currentIndex + 1;
+      setSelectedTier(TIER_ORDER[nextIndex]);
+    }
+  };
 
   // Reset page when search or tier filter changes
   useEffect(() => {
@@ -405,9 +418,26 @@ export default function Winners() {
             />
           </div>
 
-          {/* Category Filter Tabs — Per-Tier Glassmorphism */}
-          <div className="wn-filter-tabs flex items-center gap-2.5 w-full md:w-auto overflow-visible">
-            {[
+          {/* Category Filter Tabs with Arrows */}
+          <div className="relative flex items-center justify-center w-full md:w-auto">
+            {/* Left Arrow (Mobile/Tablet Only) */}
+            <button 
+              onClick={() => handleMobileTabNavigation('left')}
+              className="md:hidden absolute left-0 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-[#1e143b]/90 border border-[#f5c64c]/40 text-[#ffe58f] shadow-[0_0_12px_rgba(245,198,76,0.3)] backdrop-blur-md hover:scale-110 active:scale-95 transition-all duration-300"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div 
+              className="wn-filter-tabs flex items-center justify-center md:justify-start gap-2.5 w-full md:w-auto overflow-visible flex-nowrap pb-3 md:pb-0 px-10 md:px-0"
+              style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+            >
+              <style>{`
+                .wn-filter-tabs::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
+              {[
               {
                 tier: 'all',
                 label: 'All Tiers',
@@ -479,7 +509,7 @@ export default function Winners() {
                 <button
                   key={tier}
                   onClick={() => setSelectedTier(tier)}
-                  className={`wn-tier-btn ${isActive ? 'active' : ''}`}
+                  className={`wn-tier-btn shrink-0 items-center gap-[5px] ${isActive ? 'flex active' : 'hidden md:flex'}`}
                   style={{
                     background: isActive ? activeGrad : idleGrad,
                     color: isActive ? activeColor : idleColor,
@@ -491,8 +521,7 @@ export default function Winners() {
                     letterSpacing: '0.13em', textTransform: 'uppercase',
                     padding: '9px 15px', borderRadius: '11px',
                     whiteSpace: 'nowrap', cursor: 'pointer',
-                    fontFamily: "'Inter', 'Segoe UI', sans-serif",
-                    display: 'inline-flex', alignItems: 'center', gap: '5px'
+                    fontFamily: "'Inter', 'Segoe UI', sans-serif"
                   }}
                 >
                   {/* Shimmer overlay */}
@@ -510,6 +539,15 @@ export default function Winners() {
                 </button>
               );
             })}
+            </div>
+
+            {/* Right Arrow (Mobile/Tablet Only) */}
+            <button 
+              onClick={() => handleMobileTabNavigation('right')}
+              className="md:hidden absolute right-0 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-[#1e143b]/90 border border-[#f5c64c]/40 text-[#ffe58f] shadow-[0_0_12px_rgba(245,198,76,0.3)] backdrop-blur-md hover:scale-110 active:scale-95 transition-all duration-300"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>
