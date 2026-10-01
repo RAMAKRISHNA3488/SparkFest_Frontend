@@ -211,6 +211,7 @@ export default function AdminDashboard() {
   const [otpauthUrl, setOtpauthUrl] = useState('');
   const [copiedSecret, setCopiedSecret] = useState(false);
   const [qrMode, setQrMode] = useState('qr'); // 'qr' or 'manual'
+  const [isFirstTime, setIsFirstTime] = useState(false);
 
   // Dashboard Data State
   const [registrations, setRegistrations] = useState(DEFAULT_REGISTRATIONS);
@@ -288,12 +289,14 @@ export default function AdminDashboard() {
           }
           if (res.data.qrCode) {
             setQrCodeDataUrl(res.data.qrCode);
-          } else {
+          } else if (res.data.firstTime && res.data.secret) {
             await generateQrLocally(res.data.secret || DEFAULT_SECRET, email);
           }
 
+          setIsFirstTime(res.data.firstTime || false);
+
           setStep(2);
-          setMessage('Credentials verified! Please scan the QR code with Google Authenticator.');
+          setMessage(res.data.message || 'Credentials verified! Please scan the QR code with Google Authenticator.');
           return;
         } else if (res.data?.token) {
           setToken(res.data.token);
@@ -852,78 +855,83 @@ export default function AdminDashboard() {
                 </p>
               </div>
 
-              {/* Mode Toggle (QR Scanner vs Manual Key) */}
-              <div className="flex items-center justify-center gap-2 bg-[#090b1c] p-1 rounded-xl border border-white/10 max-w-xs mx-auto">
-                <button
-                  type="button"
-                  onClick={() => setQrMode('qr')}
-                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${qrMode === 'qr' ? 'bg-[#e5b32f] text-[#0b0d1e]' : 'text-white/60 hover:text-white'
-                    }`}
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                  <span>Scan QR Code</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQrMode('manual')}
-                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${qrMode === 'manual' ? 'bg-[#e5b32f] text-[#0b0d1e]' : 'text-white/60 hover:text-white'
-                    }`}
-                >
-                  <KeyRound className="w-3.5 h-3.5" />
-                  <span>Manual Key</span>
-                </button>
-              </div>
-
-              {/* QR SCANNER CONTAINER */}
-              {qrMode === 'qr' ? (
-                <div className="flex flex-col items-center justify-center space-y-3">
-                  {/* High-tech QR Scanner Frame */}
-                  <div className="relative p-3 rounded-2xl bg-white shadow-2xl border-4 border-[#e5b32f]/80 group">
-                    {/* Scanner Guide Corners */}
-                    <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-emerald-400 pointer-events-none"></div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-emerald-400 pointer-events-none"></div>
-                    <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-emerald-400 pointer-events-none"></div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-emerald-400 pointer-events-none"></div>
-
-                    {qrCodeDataUrl ? (
-                      <img
-                        src={qrCodeDataUrl}
-                        alt="Authenticator 2FA QR Code"
-                        className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-lg"
-                      />
-                    ) : (
-                      <div className="w-48 h-48 flex items-center justify-center bg-gray-100 rounded-lg">
-                        <RefreshCw className="w-6 h-6 animate-spin text-gray-700" />
-                      </div>
-                    )}
-                  </div>
-
-                  <p className="text-[11px] text-white/70 max-w-xs text-center">
-                    Open <strong className="text-[#ffe58f]">Google Authenticator</strong> &rarr; tap <strong className="text-emerald-400">+</strong> &rarr; select <strong className="text-white">Scan a QR code</strong>.
-                  </p>
-                </div>
-              ) : (
-                /* MANUAL SECRET KEY ENTRY */
-                <div className="p-4 rounded-2xl bg-[#090b1c] border border-white/10 text-left space-y-2">
-                  <span className="text-[11px] uppercase font-bold text-white/50 block">
-                    Manual Authenticator Key:
-                  </span>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#141634] border border-[#e5b32f]/30">
-                    <span className="font-mono font-bold text-sm tracking-wider text-[#ffe58f] break-all">
-                      {secretKey}
-                    </span>
+              {/* Only show QR scanner/manual key entry if it's the first time setup */}
+              {isFirstTime && (
+                <div className="space-y-4">
+                  {/* Mode Toggle (QR Scanner vs Manual Key) */}
+                  <div className="flex items-center justify-center gap-2 bg-[#090b1c] p-1 rounded-xl border border-white/10 max-w-xs mx-auto mt-4">
                     <button
                       type="button"
-                      onClick={handleCopySecret}
-                      className="px-2.5 py-1 rounded bg-[#e5b32f]/20 hover:bg-[#e5b32f]/30 text-xs text-[#ffe58f] font-semibold flex items-center gap-1 cursor-pointer transition-colors shrink-0 ml-2"
+                      onClick={() => setQrMode('qr')}
+                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${qrMode === 'qr' ? 'bg-[#e5b32f] text-[#0b0d1e]' : 'text-white/60 hover:text-white'
+                        }`}
                     >
-                      {copiedSecret ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedSecret ? 'Copied' : 'Copy'}</span>
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Scan QR Code</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQrMode('manual')}
+                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${qrMode === 'manual' ? 'bg-[#e5b32f] text-[#0b0d1e]' : 'text-white/60 hover:text-white'
+                        }`}
+                    >
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>Manual Key</span>
                     </button>
                   </div>
-                  <p className="text-[11px] text-white/50">
-                    Type or paste this Secret Key in your Authenticator app if your camera is unavailable.
-                  </p>
+
+                  {/* QR SCANNER CONTAINER */}
+                  {qrMode === 'qr' ? (
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      {/* High-tech QR Scanner Frame */}
+                      <div className="relative p-3 rounded-2xl bg-white shadow-2xl border-4 border-[#e5b32f]/80 group">
+                        {/* Scanner Guide Corners */}
+                        <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-emerald-400 pointer-events-none"></div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-emerald-400 pointer-events-none"></div>
+                        <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-emerald-400 pointer-events-none"></div>
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-emerald-400 pointer-events-none"></div>
+
+                        {qrCodeDataUrl ? (
+                          <img
+                            src={qrCodeDataUrl}
+                            alt="Authenticator 2FA QR Code"
+                            className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-48 h-48 flex items-center justify-center bg-gray-100 rounded-lg">
+                            <RefreshCw className="w-6 h-6 animate-spin text-gray-700" />
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="text-[11px] text-white/70 max-w-xs text-center">
+                        Open <strong className="text-[#ffe58f]">Google Authenticator</strong> &rarr; tap <strong className="text-emerald-400">+</strong> &rarr; select <strong className="text-white">Scan a QR code</strong>.
+                      </p>
+                    </div>
+                  ) : (
+                    /* MANUAL SECRET KEY ENTRY */
+                    <div className="p-4 rounded-2xl bg-[#090b1c] border border-white/10 text-left space-y-2">
+                      <span className="text-[11px] uppercase font-bold text-white/50 block">
+                        Manual Authenticator Key:
+                      </span>
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#141634] border border-[#e5b32f]/30">
+                        <span className="font-mono font-bold text-sm tracking-wider text-[#ffe58f] break-all">
+                          {secretKey}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleCopySecret}
+                          className="px-2.5 py-1 rounded bg-[#e5b32f]/20 hover:bg-[#e5b32f]/30 text-xs text-[#ffe58f] font-semibold flex items-center gap-1 cursor-pointer transition-colors shrink-0 ml-2"
+                        >
+                          {copiedSecret ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{copiedSecret ? 'Copied' : 'Copy'}</span>
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-white/50">
+                        Type or paste this Secret Key in your Authenticator app if your camera is unavailable.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
