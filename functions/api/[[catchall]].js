@@ -206,8 +206,8 @@ export async function onRequest(context) {
     const email = (body.email || '').trim().toLowerCase();
     const password = (body.password || '').trim();
 
-    const expectedEmail = (env.ADMIN_EMAIL || 'kirankumamoopuri@gmail.com').toLowerCase();
-    const expectedPassword = env.ADMIN_PASSWORD || 'klan@lucky333';
+    const expectedEmail = (env.ADMIN_EMAIL || 'kirankumarmoopuri@gmail.com').toLowerCase();
+    const expectedPassword = env.ADMIN_PASSWORD || 'klan@lucky';
 
     // Check if account is locked
     if (mockLockedUntil && new Date(mockLockedUntil) > new Date()) {
