@@ -314,20 +314,7 @@ export default function AdminDashboard() {
         setLoading(false);
         return;
       }
-      console.warn('API authentication fallback active:', err.message);
-      if (
-        (email === 'kirankumamoopuri@gmail.com' && password === 'klan@lucky333') ||
-        (email && password.length >= 6)
-      ) {
-        setChallengeToken('mock_challenge_' + Date.now());
-        setSecretKey(DEFAULT_SECRET);
-        await generateQrLocally(DEFAULT_SECRET, email);
-        setStep(2);
-        setMessage('Credentials verified! Please scan the QR code with Google Authenticator.');
-        return;
-      } else {
-        setError(err.message || 'Invalid Gmail or Password. Please check your credentials.');
-      }
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -361,19 +348,7 @@ export default function AdminDashboard() {
         setLoading(false);
         return;
       }
-      console.warn('API 2FA verification fallback active:', err.message);
-      if (cleanOtp.length === 6) {
-        const fallbackToken = 'dd_admin_session_' + Date.now();
-        setToken(fallbackToken);
-        localStorage.setItem('dd_admin_token', fallbackToken);
-        setStep(1);
-        setAuthenticatorOtp('');
-        setMessage('Authenticator verified successfully. Welcome, Administrator!');
-        fetchRegistrations(fallbackToken);
-        return;
-      } else {
-        setError(err.message || 'Invalid Authenticator code. Enter the 6-digit code shown in your Authenticator app.');
-      }
+      setError(err.message || '2FA Verification failed. Please check the code and try again.');
     } finally {
       setLoading(false);
     }
