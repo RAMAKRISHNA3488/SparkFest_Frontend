@@ -220,6 +220,7 @@ export default function AdminDashboard() {
   const [planFilter, setPlanFilter] = useState('all');
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const [isLocked, setIsLocked] = useState(false);
   const [copiedToken, setCopiedToken] = useState(null);
 
   // Helper to generate QR code locally if needed
@@ -271,6 +272,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setIsLocked(false);
 
     const email = credentials.email.trim().toLowerCase();
     const password = credentials.password.trim();
@@ -306,9 +308,15 @@ export default function AdminDashboard() {
         }
       }
     } catch (err) {
+      if (err.isLocked) {
+        setIsLocked(true);
+        setError(err.message);
+        setLoading(false);
+        return;
+      }
       console.warn('API authentication fallback active:', err.message);
       if (
-        (email === 'admin@diwalidhamaka.com' && password === 'Admin@Diwali2026') ||
+        (email === 'kirankumamoopuri@gmail.com' && password === 'klan@lucky333') ||
         (email && password.length >= 6)
       ) {
         setChallengeToken('mock_challenge_' + Date.now());
@@ -318,7 +326,7 @@ export default function AdminDashboard() {
         setMessage('Credentials verified! Please scan the QR code with Google Authenticator.');
         return;
       } else {
-        setError('Invalid Gmail or Password. Please check your credentials.');
+        setError(err.message || 'Invalid Gmail or Password. Please check your credentials.');
       }
     } finally {
       setLoading(false);
@@ -330,6 +338,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setIsLocked(false);
 
     const cleanOtp = authenticatorOtp.trim().replace(/\s+/g, '');
 
@@ -346,6 +355,12 @@ export default function AdminDashboard() {
         return;
       }
     } catch (err) {
+      if (err.isLocked) {
+        setIsLocked(true);
+        setError(err.message);
+        setLoading(false);
+        return;
+      }
       console.warn('API 2FA verification fallback active:', err.message);
       if (cleanOtp.length === 6) {
         const fallbackToken = 'dd_admin_session_' + Date.now();
@@ -357,7 +372,7 @@ export default function AdminDashboard() {
         fetchRegistrations(fallbackToken);
         return;
       } else {
-        setError('Invalid Authenticator code. Enter the 6-digit code shown in your Authenticator app.');
+        setError(err.message || 'Invalid Authenticator code. Enter the 6-digit code shown in your Authenticator app.');
       }
     } finally {
       setLoading(false);
@@ -791,7 +806,7 @@ export default function AdminDashboard() {
                     required
                     value={credentials.email}
                     onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                    placeholder="admin@diwalidhamaka.com"
+                    placeholder="kirankumamoopuri@gmail.com"
                     className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[#141535] border border-[#2a2b5a] text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#e5b32f] transition-colors"
                   />
                 </div>
@@ -935,11 +950,23 @@ export default function AdminDashboard() {
                 </div>
               )}
 
+              {/* Error or Lockdown State */}
               {error && (
-                <div className="p-3.5 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2 text-left">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
-                  <span>{error}</span>
-                </div>
+                isLocked ? (
+                  <div className="p-4 rounded-xl bg-rose-950/90 border-2 border-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.6)] text-rose-100 text-sm flex flex-col items-center gap-3 text-center animate-pulse relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-rose-500 shadow-[0_0_10px_rgba(225,29,72,1)]" />
+                    <AlertTriangle className="w-8 h-8 text-rose-500 drop-shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
+                    <div className="space-y-1">
+                      <h4 className="font-bold tracking-widest text-rose-400 uppercase text-xs">Security Lockdown Active</h4>
+                      <p className="opacity-90 leading-tight">{error}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3.5 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2 text-left">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                    <span>{error}</span>
+                  </div>
+                )
               )}
 
               {/* 6-Digit Code Input Form */}

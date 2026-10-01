@@ -19,6 +19,9 @@
  * =========================================================================
  */
 
+let mockFailedAttempts = 0;
+let mockLockedUntil = null;
+
 // Helper to return standardized JSON response
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -202,14 +205,39 @@ export async function onRequest(context) {
     const email = (body.email || '').trim().toLowerCase();
     const password = (body.password || '').trim();
 
-    const expectedEmail = (env.ADMIN_EMAIL || 'admin@diwalidhamaka.com').toLowerCase();
-    const expectedPassword = env.ADMIN_PASSWORD || 'Admin@Diwali2026';
+    const expectedEmail = (env.ADMIN_EMAIL || 'kirankumamoopuri@gmail.com').toLowerCase();
+    const expectedPassword = env.ADMIN_PASSWORD || 'klan@lucky333';
 
-    const isMatch = (email === expectedEmail && password === expectedPassword) || (email && password.length >= 6);
+    // Check if account is locked
+    if (mockLockedUntil && new Date(mockLockedUntil) > new Date()) {
+      return jsonResponse({
+        success: false,
+        message: 'SECURITY LOCKDOWN: Maximum failed attempts reached. The Administrator panel is temporarily blocked to protect against unauthorized access.',
+        isLocked: true
+      }, 403);
+    }
+
+    const isMatch = (email === expectedEmail && password === expectedPassword);
 
     if (!isMatch) {
-      return jsonResponse({ success: false, message: 'Invalid administrator credentials. Please check your email and password.' }, 401);
+      mockFailedAttempts++;
+      let errorMsg = `AUTHORIZATION FAILED: Invalid credentials. Warning: ${mockFailedAttempts}/3 failed attempts remaining before lockdown.`;
+      
+      if (mockFailedAttempts >= 3) {
+        mockLockedUntil = new Date(Date.now() + 15 * 60000).toISOString();
+        errorMsg = 'SECURITY LOCKDOWN: 3 consecutive failed attempts detected. The Administrator panel is now blocked for 15 minutes.';
+      }
+      return jsonResponse({ 
+        success: false, 
+        message: errorMsg,
+        isLocked: mockFailedAttempts >= 3,
+        attempts: mockFailedAttempts
+      }, 401);
     }
+
+    // Reset on success
+    mockFailedAttempts = 0;
+    mockLockedUntil = null;
 
     const secretKey = 'JBSWY3DPEHPK3PXP';
     const otpauthUrl = `otpauth://totp/Diwali%20Dhamaka:${encodeURIComponent(email)}?secret=${secretKey}&issuer=Diwali%20Dhamaka%202026`;
@@ -229,21 +257,44 @@ export async function onRequest(context) {
 
   // 11. Admin 2FA Verification (Step 2: Authenticator OTP -> Session Token)
   if (pathname === '/api/admin/verify-2fa' && method === 'POST') {
+    // Check if account is locked
+    if (mockLockedUntil && new Date(mockLockedUntil) > new Date()) {
+      return jsonResponse({
+        success: false,
+        message: 'SECURITY LOCKDOWN: Maximum failed attempts reached. The Administrator panel is temporarily blocked to protect against unauthorized access.',
+        isLocked: true
+      }, 403);
+    }
+
     const otp = (body.otp || '').toString().trim();
     // Accept valid 6-digit codes or master bypass codes (123456 or 777888)
     if (otp.length === 6) {
+      mockFailedAttempts = 0;
+      mockLockedUntil = null;
       const sessionToken = 'dd_admin_pages_token_' + Date.now();
       return jsonResponse({
         success: true,
         data: {
           token: sessionToken,
-          user: { email: env.ADMIN_EMAIL || 'admin@diwalidhamaka.com', role: 'admin' }
+          user: { email: env.ADMIN_EMAIL || 'kirankumamoopuri@gmail.com', role: 'admin' }
         },
         message: 'Authenticator OTP verified successfully. Welcome, Administrator!'
       });
     }
 
-    return jsonResponse({ success: false, message: 'Invalid 6-digit Authenticator OTP code.' }, 401);
+    mockFailedAttempts++;
+    let errorMsg = `AUTHORIZATION FAILED: Invalid Authenticator Code. Warning: ${mockFailedAttempts}/3 failed attempts remaining before lockdown.`;
+    if (mockFailedAttempts >= 3) {
+      mockLockedUntil = new Date(Date.now() + 15 * 60000).toISOString();
+      errorMsg = 'SECURITY LOCKDOWN: 3 consecutive failed attempts detected. The Administrator panel is now blocked for 15 minutes.';
+    }
+
+    return jsonResponse({ 
+      success: false, 
+      message: errorMsg,
+      isLocked: mockFailedAttempts >= 3,
+      attempts: mockFailedAttempts
+    }, 401);
   }
 
   // 12. Admin Registrations List

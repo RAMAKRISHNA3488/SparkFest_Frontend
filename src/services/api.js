@@ -7,7 +7,11 @@ if (import.meta.env.VITE_API_URL && !API_BASE.endsWith('/api')) {
 async function handleResponse(response) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.message || `Request failed with status ${response.status}`);
+    const error = new Error(data.message || `Request failed with status ${response.status}`);
+    if (data.isLocked) {
+      error.isLocked = true;
+    }
+    throw error;
   }
   return data;
 }
