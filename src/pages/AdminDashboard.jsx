@@ -748,8 +748,7 @@ export default function AdminDashboard() {
         className="min-h-screen pt-32 pb-24 px-4 sm:px-6 bg-cover bg-center bg-no-repeat bg-fixed flex items-center justify-center"
         style={{ backgroundImage: `url('${loginBgImage}')` }}
       >
-        <div className="w-full max-w-[420px] animated-border-box mx-auto shadow-2xl">
-          <div className="animated-border-inner p-8 sm:p-10 space-y-7 text-center">
+        <div className="w-full max-w-[420px] animated-border-box mx-auto shadow-2xl p-8 sm:p-10 space-y-7 text-center">
 
           {step === 1 ? (
             /* =========================================================
@@ -979,7 +978,6 @@ export default function AdminDashboard() {
               </form>
             </>
           )}
-          </div>
         </div>
       </div>
     );
