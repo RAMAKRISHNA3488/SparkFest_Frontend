@@ -1,4 +1,8 @@
-const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+let API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+// Automatically ensure the base URL targets the /api routing scope
+if (import.meta.env.VITE_API_URL && !API_BASE.endsWith('/api')) {
+  API_BASE += '/api';
+}
 
 async function handleResponse(response) {
   const data = await response.json().catch(() => ({}));
