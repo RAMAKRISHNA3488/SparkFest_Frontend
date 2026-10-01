@@ -42,9 +42,13 @@ import confetti from 'canvas-confetti';
 import WinnerAnnouncementModal from '../components/common/WinnerAnnouncementModal';
 import { api } from '../services/api';
 import loginBgImage from '../../Images/Midnight Blue-Gold Light Waves.png';
-import liveDrawBg from '../../Images/Golden Lucky Draw Throne Celebration.png';
+import winnersPageBg from '../../Images/winners-page-bg.png';
+import premiumSpinsBg from '../../Images/premium_spins_bg.jpg';
 import adminIconUsers from '../../Images/admin_icon_users.jpg';
 import adminIcon10rs from '../../Images/admin_icon_10rs.jpg';
+import adminIcon30rs from '../../Images/admin_icon_30rs.jpg';
+import adminIcon50rs from '../../Images/admin_icon_50rs.jpg';
+import adminIconRevenue from '../../Images/admin_icon_revenue.jpg';
 import adminIcon30rs from '../../Images/admin_icon_30rs.jpg';
 import adminIcon50rs from '../../Images/admin_icon_50rs.jpg';
 import adminIconRevenue from '../../Images/admin_icon_revenue.jpg';
@@ -1004,10 +1008,17 @@ export default function AdminDashboard() {
   // =========================================================================
   return (
     <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"
-      style={{ backgroundImage: `url('${liveDrawBg}')` }}
+      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed antialiased"
+      style={{ backgroundImage: `url('${winnersPageBg}')`, fontFamily: "'Outfit', 'Inter', system-ui, sans-serif" }}
     >
-      <div className="min-h-screen bg-black/60 backdrop-blur-[2px]">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+          * { font-family: 'Outfit', sans-serif; }
+          .font-serif { font-family: 'Outfit', sans-serif !important; }
+        `}
+      </style>
+      <div className="min-h-screen bg-black/60 backdrop-blur-sm">
         <div className="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
       {/* Top Header Bar */}
@@ -1574,57 +1585,65 @@ export default function AdminDashboard() {
         </div>
 
         {/* LOCKED STATE: Displayed when it is NOT Diwali Day and Admin Simulation is OFF */}
+        {/* LOCKED STATE: Displayed when it is NOT Diwali Day and Admin Simulation is OFF */}
         {!isSpinEnabled && (
-          <div className="p-8 sm:p-10 rounded-3xl bg-[#141634]/90 border border-amber-500/30 text-center relative overflow-hidden shadow-2xl backdrop-blur-xl">
-            <div className="max-w-xl mx-auto space-y-6">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-500/20 to-purple-500/20 border-2 border-amber-400/50 mx-auto flex items-center justify-center text-amber-300 shadow-[0_0_30px_rgba(245,158,11,0.25)]">
-                <Lock className="w-10 h-10" />
+          <div 
+            className="p-8 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-amber-500/40 group hover:border-amber-400/60 transition-all duration-700 bg-cover bg-center"
+            style={{ backgroundImage: `url('${premiumSpinsBg}')` }}
+          >
+            {/* Dark glass overlay to make text readable over the background */}
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-md group-hover:bg-black/40 transition-all duration-700" />
+            
+            <div className="max-w-xl mx-auto space-y-8 relative z-10">
+              {/* Premium Lock Icon */}
+              <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-tr from-amber-500/30 to-purple-600/30 border border-amber-300/50 mx-auto flex items-center justify-center text-amber-300 shadow-[0_0_40px_rgba(245,158,11,0.4)] backdrop-blur-xl group-hover:scale-110 group-hover:shadow-[0_0_60px_rgba(245,158,11,0.6)] transition-all duration-500">
+                <Lock className="w-12 h-12" />
               </div>
 
-              <div className="space-y-2">
-                <h3 className="font-serif text-2xl font-bold text-white">
+              <div className="space-y-3">
+                <h3 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-600 drop-shadow-2xl uppercase tracking-wider">
                   Spins Locked Until Diwali Day
                 </h3>
-                <p className="text-xs sm:text-sm text-white/60 leading-relaxed">
-                  The <strong className="text-amber-300">10rs Spin</strong>, <strong className="text-purple-300">30rs Spin</strong>, and <strong className="text-emerald-300">50rs Spin</strong> features will unlock and become operational only on Diwali Day for all verified ticket holders.
+                <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
+                  The <strong className="text-amber-300 drop-shadow-md">₹10 Spin</strong>, <strong className="text-purple-300 drop-shadow-md">₹30 Spin</strong>, and <strong className="text-emerald-300 drop-shadow-md">₹50 Spin</strong> features will unlock and become operational only on Diwali Day for all verified ticket holders.
                 </p>
               </div>
 
               {/* Countdown Timer to Diwali Day */}
-              <div className="p-4 rounded-2xl bg-[#090b1c] border border-white/10 max-w-md mx-auto space-y-2">
-                <span className="text-[10px] uppercase font-bold tracking-widest text-[#ffe58f]/70 flex items-center justify-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#e5b32f]" />
-                  <span>Countdown to Diwali Festival Day</span>
+              <div className="p-5 rounded-[2rem] bg-black/60 backdrop-blur-2xl border border-white/20 max-w-md mx-auto space-y-3 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                <span className="text-xs uppercase font-extrabold tracking-widest text-amber-400 flex items-center justify-center gap-2 drop-shadow-md">
+                  <Clock className="w-4 h-4" />
+                  <span>Countdown to Festival</span>
                 </span>
-                <div className="grid grid-cols-4 gap-2 text-center pt-1">
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                    <span className="font-mono text-xl sm:text-2xl font-black text-amber-400 block">{diwaliCountdown.days}</span>
-                    <span className="text-[9px] uppercase tracking-wider text-white/50">Days</span>
+                <div className="grid grid-cols-4 gap-3 text-center pt-2">
+                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
+                    <span className="font-mono text-2xl sm:text-3xl font-black text-amber-400 block drop-shadow-lg">{diwaliCountdown.days}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Days</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                    <span className="font-mono text-xl sm:text-2xl font-black text-white block">{diwaliCountdown.hours}</span>
-                    <span className="text-[9px] uppercase tracking-wider text-white/50">Hours</span>
+                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
+                    <span className="font-mono text-2xl sm:text-3xl font-black text-white block drop-shadow-lg">{diwaliCountdown.hours}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Hours</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                    <span className="font-mono text-xl sm:text-2xl font-black text-white block">{diwaliCountdown.minutes}</span>
-                    <span className="text-[9px] uppercase tracking-wider text-white/50">Mins</span>
+                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
+                    <span className="font-mono text-2xl sm:text-3xl font-black text-white block drop-shadow-lg">{diwaliCountdown.minutes}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Mins</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                    <span className="font-mono text-xl sm:text-2xl font-black text-white block">{diwaliCountdown.seconds}</span>
-                    <span className="text-[9px] uppercase tracking-wider text-white/50">Secs</span>
+                  <div className="p-3 rounded-2xl bg-gradient-to-b from-white/10 to-transparent border border-white/10 shadow-inner group-hover:border-amber-500/30 transition-colors duration-500">
+                    <span className="font-mono text-2xl sm:text-3xl font-black text-white block drop-shadow-lg">{diwaliCountdown.seconds}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 mt-1 block">Secs</span>
                   </div>
                 </div>
               </div>
 
               {/* Admin Test Unlock CTA */}
-              <div>
+              <div className="pt-2">
                 <button
                   type="button"
                   onClick={() => setIsDiwaliDayMode(true)}
-                  className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-[#0b0d1e] shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer inline-flex items-center gap-2"
+                  className="px-8 py-4 rounded-full text-sm font-extrabold uppercase tracking-widest bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-[#0b0d1e] shadow-[0_0_30px_rgba(245,158,11,0.5)] hover:shadow-[0_0_50px_rgba(245,158,11,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer inline-flex items-center gap-3"
                 >
-                  <Unlock className="w-4 h-4" />
-                  <span>Unlock & Test Diwali Spins (Admin Override)</span>
+                  <Unlock className="w-5 h-5" />
+                  <span>Unlock & Test Diwali Spins (Override)</span>
                 </button>
               </div>
             </div>
