@@ -8,6 +8,7 @@ import {
   ShieldCheck, FileText, Sparkle, ArrowRight
 } from 'lucide-react';
 import { api } from '../services/api';
+import emailjs from '@emailjs/browser';
 import contactPageBg from '../../Images/contact-page-bg.png';
 
 const QUICK_SUBJECTS = [
@@ -322,6 +323,33 @@ export default function Contact() {
         setSavedInquiries(saved.slice(0, 25));
         setSelectedInquiry(inquiryRecord);
       } catch (_) {}
+
+      // Send actual email using EmailJS
+      try {
+        // Prepare template parameters
+        const templateParams = {
+          reference_id: referenceNumber,
+          from_name: formData.name.trim(),
+          from_email: formData.email.trim(),
+          phone_number: formData.phone.trim(),
+          subject: formData.subject.trim(),
+          ticket_number: formData.ticketNumber.trim() || 'N/A',
+          message: formData.message.trim(),
+          to_email: 'support@viswasluckydraw.com'
+        };
+
+        // NOTE: You will need to replace these with your actual EmailJS IDs
+        // emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams, 'YOUR_PUBLIC_KEY')
+        
+        await emailjs.send(
+          import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_placeholder', 
+          import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_placeholder', 
+          templateParams, 
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'public_key_placeholder'
+        );
+      } catch (emailErr) {
+        console.warn('EmailJS error (You need to configure your keys):', emailErr);
+      }
 
       // Fire Festive Confetti
       try {
