@@ -42,7 +42,12 @@ import confetti from 'canvas-confetti';
 import WinnerAnnouncementModal from '../components/common/WinnerAnnouncementModal';
 import { api } from '../services/api';
 import loginBgImage from '../../Images/Midnight Blue-Gold Light Waves.png';
-
+import liveDrawBg from '../../Images/Golden Lucky Draw Throne Celebration.png';
+import adminIconUsers from '../../Images/admin_icon_users.jpg';
+import adminIcon10rs from '../../Images/admin_icon_10rs.jpg';
+import adminIcon30rs from '../../Images/admin_icon_30rs.jpg';
+import adminIcon50rs from '../../Images/admin_icon_50rs.jpg';
+import adminIconRevenue from '../../Images/admin_icon_revenue.jpg';
 // Verified sample dataset adhering strictly to requested fields:
 // S.No, Full Name, Mobile Number, Gmail, Location, Tocken, Plan (like 10rs or 30rs like), Data
 const DEFAULT_REGISTRATIONS = [
@@ -998,19 +1003,27 @@ export default function AdminDashboard() {
   // Exactly requested fields: s.no, full name, mobile number, gmail, location, tocken, plan, data
   // =========================================================================
   return (
-    <div className="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div 
+      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: `url('${liveDrawBg}')` }}
+    >
+      <div className="min-h-screen bg-black/60 backdrop-blur-[2px]">
+        <div className="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
       {/* Top Header Bar */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 sm:p-7 rounded-3xl bg-[#141634] border border-[#e5b32f]/30 shadow-2xl relative overflow-hidden">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1e153b] border border-[#e5b32f]/40 text-[#ffe58f] text-[11px] font-semibold uppercase tracking-wider">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 sm:p-7 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden group hover:border-[#e5b32f]/40 transition-all duration-500">
+        {/* Animated Glow behind header */}
+        <div className="absolute -inset-x-20 -top-20 h-40 bg-gradient-to-r from-transparent via-[#e5b32f]/10 to-transparent blur-3xl group-hover:via-[#e5b32f]/20 transition-all duration-1000 animate-pulse" />
+        
+        <div className="space-y-2 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0b0d1e]/80 border border-[#e5b32f]/40 text-[#ffe58f] text-[11px] font-semibold uppercase tracking-wider shadow-[0_0_15px_rgba(229,179,47,0.2)]">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>2FA Authenticated • Administrator Console</span>
           </div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold gold-gradient-text">
+          <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#aa8010] drop-shadow-lg">
             Diwali Dhamaka Operations
           </h1>
-          <p className="text-xs text-white/60">
+          <p className="text-sm font-medium text-white/70">
             Real-time verified participants, tokens, and plan bookings repository.
           </p>
         </div>
@@ -1066,64 +1079,65 @@ export default function AdminDashboard() {
           3. Total Number of 30rs Plans
           4. Total Number of 50rs Plans
           ========================================================================= */}
-      <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1 relative z-10">
           <div>
-            <h2 className="text-sm uppercase tracking-wider font-bold text-white/90 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[#e5b32f]" />
+            <h2 className="text-sm uppercase tracking-widest font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 flex items-center gap-2 drop-shadow-md">
+              <TrendingUp className="w-4 h-4 text-amber-400" />
               <span>Real-Time Plan Analytics & Key Metrics</span>
             </h2>
-            <p className="text-[11px] text-white/50">
+            <p className="text-xs text-white/60 mt-1 font-medium">
               Interactive feature cards: Click any card to filter participants table below.
             </p>
           </div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#1a1c3d] border border-[#e5b32f]/40 text-xs text-[#ffe58f] font-mono shadow-sm self-start sm:self-auto">
-            <IndianRupee className="w-3.5 h-3.5 text-[#e5b32f]" />
-            <span>Total Collection: <strong className="text-white font-bold">₹{planCounts.totalRevenue.toLocaleString()}</strong></span>
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-black/50 backdrop-blur-md border border-[#e5b32f]/50 text-sm text-[#ffe58f] font-mono shadow-[0_0_20px_rgba(229,179,47,0.3)] hover:scale-105 transition-transform duration-300">
+            <img src={adminIconRevenue} alt="Revenue" className="w-7 h-7 rounded-full object-cover shadow-[0_0_10px_rgba(229,179,47,0.8)]" />
+            <span className="font-semibold uppercase tracking-wider">Total Collection: <strong className="text-white text-lg ml-1">₹{planCounts.totalRevenue.toLocaleString()}</strong></span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* FEATURE 1: Total Number of Peoples */}
           <div
             onClick={() => setPlanFilter('all')}
-            className={`p-5 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden group border ${planFilter === 'all'
-              ? 'bg-gradient-to-br from-[#2a1c4e] via-[#1d1b3d] to-[#12142d] border-[#e5b32f] ring-2 ring-[#e5b32f]/60 shadow-[0_0_25px_rgba(229,179,47,0.25)] scale-[1.01]'
-              : 'bg-gradient-to-br from-[#1b1c3b]/90 via-[#151733]/90 to-[#0e1026]/90 border-white/10 hover:border-[#e5b32f]/50 hover:bg-[#1f2146]'
+            className={`p-6 rounded-[2rem] cursor-pointer transition-all duration-500 relative overflow-hidden group border backdrop-blur-xl ${planFilter === 'all'
+              ? 'bg-black/60 border-amber-500 shadow-[0_0_35px_rgba(245,158,11,0.4)] scale-[1.02] -translate-y-1'
+              : 'bg-black/40 border-white/10 hover:border-amber-500/50 hover:bg-black/50 hover:-translate-y-1'
               }`}
           >
-            <div className="flex items-start justify-between">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="flex items-start justify-between relative z-10">
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-0.5">
+                <span className="text-[10px] uppercase font-extrabold tracking-widest text-amber-400/90 block mb-1">
                   Feature 1 • All Users
                 </span>
-                <h3 className="text-xs font-semibold text-white/80">
-                  Total Number of Peoples
+                <h3 className="text-sm font-bold text-white/90 font-serif">
+                  Total Participants
                 </h3>
               </div>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${planFilter === 'all' ? 'bg-[#e5b32f] text-[#0b0d1e]' : 'bg-[#e5b32f]/15 text-[#ffe58f] group-hover:bg-[#e5b32f]/25'
-                }`}>
-                <Users className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-[1.2rem] overflow-hidden shadow-[0_0_15px_rgba(245,158,11,0.5)] group-hover:scale-110 transition-transform duration-500">
+                <img src={adminIconUsers} alt="Users" className="w-full h-full object-cover" />
               </div>
             </div>
 
-            <div className="mt-3 flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold font-mono text-white tracking-tight">
+            <div className="mt-5 flex items-baseline justify-between relative z-10">
+              <span className="text-4xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 tracking-tight drop-shadow-md">
                 {planCounts.totalPeoples}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e5b32f]/20 text-[#ffe58f] border border-[#e5b32f]/30">
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-widest">
                 100% Base
               </span>
             </div>
 
             {/* Visual Progress Bar */}
-            <div className="w-full bg-white/10 h-1.5 rounded-full mt-3 overflow-hidden">
-              <div className="bg-[#e5b32f] h-full rounded-full transition-all duration-500 w-full" />
+            <div className="w-full bg-black/40 h-2 rounded-full mt-5 overflow-hidden border border-white/5 relative z-10">
+              <div className="bg-gradient-to-r from-amber-600 to-amber-400 h-full rounded-full transition-all duration-1000 w-full shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
             </div>
 
-            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-white/50">
-              <span>All registered participants</span>
-              <span className={`text-[10px] font-semibold ${planFilter === 'all' ? 'text-amber-400' : 'text-white/40'}`}>
+            <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-medium text-white/50 relative z-10">
+              <span>All registered users</span>
+              <span className={`text-[10px] uppercase tracking-widest font-bold ${planFilter === 'all' ? 'text-amber-400 animate-pulse' : 'text-white/30 group-hover:text-amber-400/50'}`}>
                 {planFilter === 'all' ? '● Active Filter' : 'Click to filter'}
               </span>
             </div>
@@ -1132,46 +1146,47 @@ export default function AdminDashboard() {
           {/* FEATURE 2: Total Number of 10rs Plans */}
           <div
             onClick={() => setPlanFilter('10')}
-            className={`p-5 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden group border ${planFilter === '10'
-              ? 'bg-gradient-to-br from-[#301c10] via-[#241724] to-[#12142d] border-orange-400 ring-2 ring-orange-400/60 shadow-[0_0_25px_rgba(251,146,60,0.25)] scale-[1.01]'
-              : 'bg-gradient-to-br from-[#1b1c3b]/90 via-[#151733]/90 to-[#0e1026]/90 border-white/10 hover:border-orange-500/50 hover:bg-[#1f2146]'
+            className={`p-6 rounded-[2rem] cursor-pointer transition-all duration-500 relative overflow-hidden group border backdrop-blur-xl ${planFilter === '10'
+              ? 'bg-black/60 border-orange-500 shadow-[0_0_35px_rgba(249,115,22,0.4)] scale-[1.02] -translate-y-1'
+              : 'bg-black/40 border-white/10 hover:border-orange-500/50 hover:bg-black/50 hover:-translate-y-1'
               }`}
           >
-            <div className="flex items-start justify-between">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="flex items-start justify-between relative z-10">
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-orange-400 block mb-0.5">
+                <span className="text-[10px] uppercase font-extrabold tracking-widest text-orange-400 block mb-1">
                   Feature 2 • ₹10 Basic
                 </span>
-                <h3 className="text-xs font-semibold text-white/80">
+                <h3 className="text-sm font-bold text-white/90 font-serif">
                   Total 10rs Plans
                 </h3>
               </div>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${planFilter === '10' ? 'bg-orange-500 text-white' : 'bg-orange-500/15 text-orange-400 group-hover:bg-orange-500/25'
-                }`}>
-                <TicketIcon className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-[1.2rem] overflow-hidden shadow-[0_0_15px_rgba(249,115,22,0.5)] group-hover:scale-110 transition-transform duration-500">
+                <img src={adminIcon10rs} alt="10rs" className="w-full h-full object-cover" />
               </div>
             </div>
 
-            <div className="mt-3 flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold font-mono text-white tracking-tight">
+            <div className="mt-5 flex items-baseline justify-between relative z-10">
+              <span className="text-4xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 tracking-tight drop-shadow-md">
                 {planCounts.ten}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30 uppercase tracking-widest">
                 {planCounts.tenPercent}% Share
               </span>
             </div>
 
             {/* Visual Progress Bar */}
-            <div className="w-full bg-white/10 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-black/40 h-2 rounded-full mt-5 overflow-hidden border border-white/5 relative z-10">
               <div
-                className="bg-orange-500 h-full rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-orange-600 to-orange-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(249,115,22,0.8)]"
                 style={{ width: `${planCounts.tenPercent}%` }}
               />
             </div>
 
-            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-white/50">
-              <span className="font-mono text-orange-300/80">₹{(planCounts.ten * 10).toLocaleString()} Collected</span>
-              <span className={`text-[10px] font-semibold ${planFilter === '10' ? 'text-orange-400' : 'text-white/40'}`}>
+            <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-medium text-white/50 relative z-10">
+              <span className="font-mono text-orange-300/90 font-bold tracking-wider">₹{(planCounts.ten * 10).toLocaleString()} Collected</span>
+              <span className={`text-[10px] uppercase tracking-widest font-bold ${planFilter === '10' ? 'text-orange-400 animate-pulse' : 'text-white/30 group-hover:text-orange-400/50'}`}>
                 {planFilter === '10' ? '● Active Filter' : 'Click to filter'}
               </span>
             </div>
@@ -1180,46 +1195,47 @@ export default function AdminDashboard() {
           {/* FEATURE 3: Total Number of 30rs Plans */}
           <div
             onClick={() => setPlanFilter('30')}
-            className={`p-5 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden group border ${planFilter === '30'
-              ? 'bg-gradient-to-br from-[#2f1046] via-[#201438] to-[#12142d] border-purple-400 ring-2 ring-purple-400/60 shadow-[0_0_25px_rgba(192,132,252,0.25)] scale-[1.01]'
-              : 'bg-gradient-to-br from-[#1b1c3b]/90 via-[#151733]/90 to-[#0e1026]/90 border-white/10 hover:border-purple-500/50 hover:bg-[#1f2146]'
+            className={`p-6 rounded-[2rem] cursor-pointer transition-all duration-500 relative overflow-hidden group border backdrop-blur-xl ${planFilter === '30'
+              ? 'bg-black/60 border-purple-500 shadow-[0_0_35px_rgba(168,85,247,0.4)] scale-[1.02] -translate-y-1'
+              : 'bg-black/40 border-white/10 hover:border-purple-500/50 hover:bg-black/50 hover:-translate-y-1'
               }`}
           >
-            <div className="flex items-start justify-between">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="flex items-start justify-between relative z-10">
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-purple-400 block mb-0.5">
+                <span className="text-[10px] uppercase font-extrabold tracking-widest text-purple-400 block mb-1">
                   Feature 3 • ₹30 Festival
                 </span>
-                <h3 className="text-xs font-semibold text-white/80">
+                <h3 className="text-sm font-bold text-white/90 font-serif">
                   Total 30rs Plans
                 </h3>
               </div>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${planFilter === '30' ? 'bg-purple-500 text-white' : 'bg-purple-500/15 text-purple-300 group-hover:bg-purple-500/25'
-                }`}>
-                <Sparkles className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-[1.2rem] overflow-hidden shadow-[0_0_15px_rgba(168,85,247,0.5)] group-hover:scale-110 transition-transform duration-500">
+                <img src={adminIcon30rs} alt="30rs" className="w-full h-full object-cover" />
               </div>
             </div>
 
-            <div className="mt-3 flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold font-mono text-white tracking-tight">
+            <div className="mt-5 flex items-baseline justify-between relative z-10">
+              <span className="text-4xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 tracking-tight drop-shadow-md">
                 {planCounts.thirty}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-widest">
                 {planCounts.thirtyPercent}% Share
               </span>
             </div>
 
             {/* Visual Progress Bar */}
-            <div className="w-full bg-white/10 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-black/40 h-2 rounded-full mt-5 overflow-hidden border border-white/5 relative z-10">
               <div
-                className="bg-purple-500 h-full rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-purple-600 to-purple-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(168,85,247,0.8)]"
                 style={{ width: `${planCounts.thirtyPercent}%` }}
               />
             </div>
 
-            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-white/50">
-              <span className="font-mono text-purple-300/80">₹{(planCounts.thirty * 30).toLocaleString()} Collected</span>
-              <span className={`text-[10px] font-semibold ${planFilter === '30' ? 'text-purple-400' : 'text-white/40'}`}>
+            <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-medium text-white/50 relative z-10">
+              <span className="font-mono text-purple-300/90 font-bold tracking-wider">₹{(planCounts.thirty * 30).toLocaleString()} Collected</span>
+              <span className={`text-[10px] uppercase tracking-widest font-bold ${planFilter === '30' ? 'text-purple-400 animate-pulse' : 'text-white/30 group-hover:text-purple-400/50'}`}>
                 {planFilter === '30' ? '● Active Filter' : 'Click to filter'}
               </span>
             </div>
@@ -1228,46 +1244,47 @@ export default function AdminDashboard() {
           {/* FEATURE 4: Total Number of 50rs Plans */}
           <div
             onClick={() => setPlanFilter('50')}
-            className={`p-5 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden group border ${planFilter === '50'
-              ? 'bg-gradient-to-br from-[#0c2e25] via-[#102330] to-[#12142d] border-emerald-400 ring-2 ring-emerald-400/60 shadow-[0_0_25px_rgba(52,211,153,0.25)] scale-[1.01]'
-              : 'bg-gradient-to-br from-[#1b1c3b]/90 via-[#151733]/90 to-[#0e1026]/90 border-white/10 hover:border-emerald-500/50 hover:bg-[#1f2146]'
+            className={`p-6 rounded-[2rem] cursor-pointer transition-all duration-500 relative overflow-hidden group border backdrop-blur-xl ${planFilter === '50'
+              ? 'bg-black/60 border-emerald-500 shadow-[0_0_35px_rgba(16,185,129,0.4)] scale-[1.02] -translate-y-1'
+              : 'bg-black/40 border-white/10 hover:border-emerald-500/50 hover:bg-black/50 hover:-translate-y-1'
               }`}
           >
-            <div className="flex items-start justify-between">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="flex items-start justify-between relative z-10">
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-0.5">
+                <span className="text-[10px] uppercase font-extrabold tracking-widest text-emerald-400 block mb-1">
                   Feature 4 • ₹50 VIP
                 </span>
-                <h3 className="text-xs font-semibold text-white/80">
+                <h3 className="text-sm font-bold text-white/90 font-serif">
                   Total 50rs Plans
                 </h3>
               </div>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${planFilter === '50' ? 'bg-emerald-500 text-white' : 'bg-emerald-500/15 text-emerald-300 group-hover:bg-emerald-500/25'
-                }`}>
-                <Crown className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-[1.2rem] overflow-hidden shadow-[0_0_15px_rgba(16,185,129,0.5)] group-hover:scale-110 transition-transform duration-500">
+                <img src={adminIcon50rs} alt="50rs" className="w-full h-full object-cover" />
               </div>
             </div>
 
-            <div className="mt-3 flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold font-mono text-white tracking-tight">
+            <div className="mt-5 flex items-baseline justify-between relative z-10">
+              <span className="text-4xl font-extrabold font-mono text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 tracking-tight drop-shadow-md">
                 {planCounts.fifty}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-widest">
                 {planCounts.fiftyPercent}% Share
               </span>
             </div>
 
             {/* Visual Progress Bar */}
-            <div className="w-full bg-white/10 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div className="w-full bg-black/40 h-2 rounded-full mt-5 overflow-hidden border border-white/5 relative z-10">
               <div
-                className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.8)]"
                 style={{ width: `${planCounts.fiftyPercent}%` }}
               />
             </div>
 
-            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-white/50">
-              <span className="font-mono text-emerald-300/80">₹{(planCounts.fifty * 50).toLocaleString()} Collected</span>
-              <span className={`text-[10px] font-semibold ${planFilter === '50' ? 'text-emerald-400' : 'text-white/40'}`}>
+            <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-medium text-white/50 relative z-10">
+              <span className="font-mono text-emerald-300/90 font-bold tracking-wider">₹{(planCounts.fifty * 50).toLocaleString()} Collected</span>
+              <span className={`text-[10px] uppercase tracking-widest font-bold ${planFilter === '50' ? 'text-emerald-400 animate-pulse' : 'text-white/30 group-hover:text-emerald-400/50'}`}>
                 {planFilter === '50' ? '● Active Filter' : 'Click to filter'}
               </span>
             </div>
@@ -1819,7 +1836,6 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* Spin Winner Announcement Modal */}
       {spinWinnerModal && (
         <WinnerAnnouncementModal
           isOpen={isWinnerModalOpen}
@@ -1827,6 +1843,8 @@ export default function AdminDashboard() {
           onClose={() => setIsWinnerModalOpen(false)}
         />
       )}
+      </div>
     </div>
+  </div>
   );
 }
