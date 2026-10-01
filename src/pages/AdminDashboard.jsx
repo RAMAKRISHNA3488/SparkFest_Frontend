@@ -41,6 +41,7 @@ import {
 import confetti from 'canvas-confetti';
 import WinnerAnnouncementModal from '../components/common/WinnerAnnouncementModal';
 import { api } from '../services/api';
+import loginBgImage from '../../Images/Midnight Blue-Gold Light Waves.png';
 
 // Verified sample dataset adhering strictly to requested fields:
 // S.No, Full Name, Mobile Number, Gmail, Location, Tocken, Plan (like 10rs or 30rs like), Data
@@ -743,30 +744,31 @@ export default function AdminDashboard() {
   // =========================================================================
   if (!token) {
     return (
-      <div className="pt-32 pb-24 max-w-lg mx-auto px-4 sm:px-6">
-        <div className="p-7 sm:p-9 rounded-3xl bg-[#141634] border border-[#e5b32f]/40 shadow-2xl space-y-6 text-center backdrop-blur-xl relative overflow-hidden">
-          {/* Subtle Decorative Aura */}
-          <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#e5b32f]/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div 
+        className="min-h-screen pt-32 pb-24 px-4 sm:px-6 bg-cover bg-center bg-no-repeat bg-fixed flex items-center justify-center"
+        style={{ backgroundImage: `url('${loginBgImage}')` }}
+      >
+        <div className="w-full max-w-[420px] animated-border-box mx-auto shadow-2xl">
+          <div className="animated-border-inner p-8 sm:p-10 space-y-7 text-center">
 
           {step === 1 ? (
             /* =========================================================
                STEP 1: GMAIL & PASSWORD
                ========================================================= */
             <>
-              <div className="w-16 h-16 rounded-2xl bg-[#281545] border border-[#e5b32f]/40 flex items-center justify-center text-[#ffe58f] mx-auto shadow-gold-glow">
-                <Lock className="w-8 h-8" />
+              <div className="w-16 h-16 rounded-[1.25rem] bg-[#1a1836] border-[1.5px] border-[#e5b32f] flex items-center justify-center text-[#e5b32f] mx-auto shadow-[0_0_20px_rgba(229,179,47,0.3)]">
+                <Lock className="w-7 h-7" strokeWidth={2} />
               </div>
 
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#ffe58f]/70">
-                  Step 1 of 2 • Secure Admin Portal
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e5b32f]">
+                  STEP 1 OF 2 • SECURE ADMIN PORTAL
                 </span>
-                <h1 className="font-serif text-2xl sm:text-3xl font-bold gold-gradient-text mt-1">
+                <h1 className="font-serif text-4xl font-bold gold-gradient-text mt-2">
                   Admin Login
                 </h1>
-                <p className="text-xs text-white/60 mt-1.5">
-                  Enter your official Gmail and password to initiate session.
+                <p className="text-[13px] text-white/80 mt-2">
+                  Enter your official email and password to continue.
                 </p>
               </div>
 
@@ -777,58 +779,54 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              <form onSubmit={handleInitiateLogin} className="space-y-4 text-left">
-                <div>
-                  <label className="block text-xs uppercase font-bold text-white/70 mb-1.5 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-[#e5b32f]" />
-                    <span>Gmail / Admin Email</span>
-                  </label>
+              <form onSubmit={handleInitiateLogin} className="space-y-4">
+                <div className="relative flex items-center">
+                  <div className="absolute left-4 text-[#e5b32f]">
+                    <Mail className="w-5 h-5" strokeWidth={1.5} />
+                  </div>
                   <input
                     type="email"
                     required
                     value={credentials.email}
                     onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                    placeholder="Enter Gmail / Admin Email"
-                    className="w-full px-4 py-3 rounded-xl bg-[#090b1c] border border-white/15 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#e5b32f] transition-colors"
+                    placeholder="admin@diwalidhamaka.com"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[#141535] border border-[#2a2b5a] text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#e5b32f] transition-colors"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs uppercase font-bold text-white/70 mb-1.5 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <Lock className="w-3.5 h-3.5 text-[#e5b32f]" />
-                      <span>Password</span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-[11px] text-white/50 hover:text-white flex items-center gap-1 cursor-pointer"
-                    >
-                      {showPassword ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      <span>{showPassword ? 'Hide' : 'Show'}</span>
-                    </button>
-                  </label>
+                <div className="relative flex items-center">
+                  <div className="absolute left-4 text-[#e5b32f]">
+                    <Lock className="w-5 h-5" strokeWidth={1.5} />
+                  </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={credentials.password}
                     onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                     placeholder="••••••••••••"
-                    className="w-full px-4 py-3 rounded-xl bg-[#090b1c] border border-white/15 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#e5b32f] transition-colors"
+                    className="w-full pl-12 pr-20 py-3.5 rounded-xl bg-[#141535] border border-[#2a2b5a] text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#e5b32f] transition-colors tracking-widest"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 text-[12px] text-white/60 hover:text-white flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    <span>{showPassword ? 'Hide' : 'Show'}</span>
+                  </button>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-full font-bold text-xs uppercase tracking-wider text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:shadow-[0_0_25px_rgba(229,179,47,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full !mt-6 py-3.5 rounded-full font-bold text-sm tracking-wide text-[#0b0d1e] bg-gradient-to-r from-[#fce28b] via-[#d4af37] to-[#fce28b] hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(229,179,47,0.3)]"
                 >
                   {loading ? (
-                    <RefreshCw className="w-4 h-4 animate-spin text-[#0b0d1e]" />
+                    <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
                       <span>AUTHENTICATE</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
                     </>
                   )}
                 </button>
@@ -981,6 +979,7 @@ export default function AdminDashboard() {
               </form>
             </>
           )}
+          </div>
         </div>
       </div>
     );
