@@ -21,6 +21,7 @@
 
 let mockFailedAttempts = 0;
 let mockLockedUntil = null;
+let mockTwoFactorComplete = false;
 
 // Helper to return standardized JSON response
 function jsonResponse(data, status = 200) {
@@ -241,16 +242,20 @@ export async function onRequest(context) {
 
     const secretKey = 'JBSWY3DPEHPK3PXP';
     const otpauthUrl = `otpauth://totp/Diwali%20Dhamaka:${encodeURIComponent(email)}?secret=${secretKey}&issuer=Diwali%20Dhamaka%202026`;
+    const isFirstTime = !mockTwoFactorComplete;
 
     return jsonResponse({
       success: true,
       data: {
         requireOtp: true,
         challengeToken: 'cf_challenge_' + Date.now(),
-        secret: secretKey,
-        otpauthUrl,
+        secret: isFirstTime ? secretKey : null,
+        otpauthUrl: isFirstTime ? otpauthUrl : null,
         email,
-        message: 'Credentials verified! Scan the QR Code with Google Authenticator and enter the 6-digit OTP.'
+        firstTime: isFirstTime,
+        message: isFirstTime 
+          ? 'Credentials verified! First time setup: Scan the QR Code with Google Authenticator and enter the 6-digit OTP.' 
+          : 'Credentials verified! Please enter the 6-digit OTP from your Authenticator app.'
       }
     });
   }
@@ -271,6 +276,7 @@ export async function onRequest(context) {
     if (otp.length === 6) {
       mockFailedAttempts = 0;
       mockLockedUntil = null;
+      mockTwoFactorComplete = true;
       const sessionToken = 'dd_admin_pages_token_' + Date.now();
       return jsonResponse({
         success: true,
