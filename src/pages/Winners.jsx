@@ -118,7 +118,7 @@ const getTierTheme = (tier) => {
     case 'purple':
     default:
       return {
-        label: 'Diwali Bonanza',
+        label: 'Purple Tier',
         TierIcon: Gift,
         tierIconColor: 'text-fuchsia-300 drop-shadow-[0_0_8px_rgba(232,121,249,0.85)] fill-fuchsia-400/30',
         badgeBg: 'bg-gradient-to-r from-purple-500/25 via-purple-400/15 to-purple-950/70',
@@ -149,30 +149,9 @@ const getTierTheme = (tier) => {
   }
 };
 
-const defaultVerifiedWinners = [
-  // --- GOLD TIER: 1st to 5th Prize ---
-  { id: 1, ticketNumber: 'DD-2026-HYD-50K', winnerName: 'Rohith Kumar', maskedName: 'Rohith K****', prizeTitle: '1st Prize', prizeAmount: '₹10,000', tier: 'gold', drawDate: '10 Nov 2026', city: 'Hyderabad' },
-  { id: 2, ticketNumber: 'DD-2026-VIJ-25K', winnerName: 'Sravani Reddy', maskedName: 'Sravani R****', prizeTitle: '2nd Prize', prizeAmount: '₹9,500', tier: 'gold', drawDate: '10 Nov 2026', city: 'Vijayawada' },
-  { id: 3, ticketNumber: 'DD-2026-BLR-10K', winnerName: 'Manoj Naik', maskedName: 'Manoj N****', prizeTitle: '3rd Prize', prizeAmount: '₹9,000', tier: 'gold', drawDate: '10 Nov 2026', city: 'Bengaluru' },
-  { id: 4, ticketNumber: 'DD-2026-CHN-10K', winnerName: 'Keerthi Chowdary', maskedName: 'Keerthi C****', prizeTitle: '4th Prize', prizeAmount: '₹8,500', tier: 'gold', drawDate: '10 Nov 2026', city: 'Chennai' },
-  { id: 5, ticketNumber: 'DD-2026-VSKP-10K', winnerName: 'Akhil Varma', maskedName: 'Akhil V****', prizeTitle: '5th Prize', prizeAmount: '₹8,000', tier: 'gold', drawDate: '10 Nov 2026', city: 'Visakhapatnam' },
-  // --- SILVER TIER: 6th to 10th Prize ---
-  { id: 6, ticketNumber: 'DD-2026-MUM-5K', winnerName: 'Ananya Sharma', maskedName: 'Ananya S****', prizeTitle: '6th Prize', prizeAmount: '₹7,500', tier: 'silver', drawDate: '10 Nov 2026', city: 'Mumbai' },
-  { id: 7, ticketNumber: 'DD-2026-DEL-50K', winnerName: 'Vikramaditya Singh', maskedName: 'Vikram S****', prizeTitle: '7th Prize', prizeAmount: '₹7,000', tier: 'silver', drawDate: '10 Nov 2026', city: 'New Delhi' },
-  { id: 8, ticketNumber: 'DD-2026-PUN-25K', winnerName: 'Pooja Deshmukh', maskedName: 'Pooja D****', prizeTitle: '8th Prize', prizeAmount: '₹6,500', tier: 'silver', drawDate: '10 Nov 2026', city: 'Pune' },
-  { id: 9, ticketNumber: 'DD-2026-JPR-10K', winnerName: 'Arjun Rathore', maskedName: 'Arjun R****', prizeTitle: '9th Prize', prizeAmount: '₹6,000', tier: 'silver', drawDate: '10 Nov 2026', city: 'Jaipur' },
-  { id: 10, ticketNumber: 'DD-2026-KOC-25K', winnerName: 'Meera Nambiar', maskedName: 'Meera N****', prizeTitle: '10th Prize', prizeAmount: '₹5,500', tier: 'silver', drawDate: '10 Nov 2026', city: 'Kochi' },
-  // --- BRONZE TIER: Festival Special Lucky Draw ---
-  { id: 11, ticketNumber: 'DD-2026-AHM-10K', winnerName: 'Devang Patel', maskedName: 'Devang P****', prizeTitle: 'Festival Special', prizeAmount: '₹10,000', offerTag: '3X Entries • Triple Chances', tier: 'bronze', drawDate: '10 Nov 2026', city: 'Ahmedabad' },
-  { id: 12, ticketNumber: 'DD-2026-IND-5K', winnerName: 'Neha Kulkarni', maskedName: 'Neha K****', prizeTitle: 'Festival Special', prizeAmount: '₹10,000', offerTag: '3X Entries • Triple Chances', tier: 'bronze', drawDate: '10 Nov 2026', city: 'Indore' },
-  // --- PURPLE TIER: Early Bird Bonus Lucky Draw ---
-  { id: 13, ticketNumber: 'DD-2026-KOL-25K', winnerName: 'Subhash Bose', maskedName: 'Subhash B****', prizeTitle: 'Early Bird Bonus', prizeAmount: '₹10,000', offerTag: '5X Entries • VIP Bumper Pool', tier: 'purple', drawDate: '10 Nov 2026', city: 'Kolkata' },
-  { id: 14, ticketNumber: 'DD-2026-SUR-10K', winnerName: 'Ketan Mehta', maskedName: 'Ketan M****', prizeTitle: 'Early Bird Bonus', prizeAmount: '₹10,000', offerTag: '5X Entries • VIP Bumper Pool', tier: 'purple', drawDate: '10 Nov 2026', city: 'Surat' }
-];
-
 export default function Winners() {
   const location = useLocation();
-  const [winners, setWinners] = useState(defaultVerifiedWinners);
+  const [winners, setWinners] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedTier, setSelectedTier] = useState('all');
   const [selectedWinner, setSelectedWinner] = useState(null);
@@ -207,41 +186,24 @@ export default function Winners() {
 
   useEffect(() => {
     async function loadWinners() {
+      setLoading(true);
       try {
-        const res = await api.getWinners({ search, tier: selectedTier });
-        if (res.success && res.data && res.data.length > 0) {
-          setWinners(res.data);
-        } else {
-          let filtered = defaultVerifiedWinners;
-          if (selectedTier !== 'all') {
-            filtered = filtered.filter((w) => w.tier === selectedTier);
-          }
-          if (search.trim()) {
-            const query = search.toLowerCase();
-            filtered = filtered.filter(
-              (w) =>
-                w.ticketNumber.toLowerCase().includes(query) ||
-                w.winnerName.toLowerCase().includes(query) ||
-                w.city.toLowerCase().includes(query)
-            );
-          }
-          setWinners(filtered);
-        }
+        const cleanSearch = search.trim() || undefined;
+        const cleanTier = selectedTier !== 'all' ? selectedTier : undefined;
+
+        const res = await api.getWinners({
+          search: cleanSearch,
+          tier: cleanTier
+        });
+
+        let list = (res && res.success && Array.isArray(res.data)) ? [...res.data] : [];
+
+        // Winners retrieved strictly dynamically from database
+
+        setWinners(list);
       } catch (err) {
-        let filtered = defaultVerifiedWinners;
-        if (selectedTier !== 'all') {
-          filtered = filtered.filter((w) => w.tier === selectedTier);
-        }
-        if (search.trim()) {
-          const query = search.toLowerCase();
-          filtered = filtered.filter(
-            (w) =>
-              w.ticketNumber.toLowerCase().includes(query) ||
-              w.winnerName.toLowerCase().includes(query) ||
-              w.city.toLowerCase().includes(query)
-          );
-        }
-        setWinners(filtered);
+        console.error('Failed to fetch winners from database:', err);
+        setWinners([]);
       } finally {
         setLoading(false);
       }
@@ -553,7 +515,13 @@ export default function Winners() {
       </div>
 
       {/* Winners Grid */}
-      {winners.length === 0 ? (
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-24 bg-[#0e1025]/60 rounded-3xl border border-amber-400/20 backdrop-blur-xl">
+          <div className="w-12 h-12 border-3 border-amber-400/20 border-t-amber-400 rounded-full animate-spin mb-4 drop-shadow-[0_0_12px_rgba(245,198,76,0.5)]" />
+          <h3 className="font-serif text-base font-semibold text-amber-200">Loading Verified Winners</h3>
+          <p className="text-xs text-amber-200/50 mt-1">Retrieving official verified winner records from database...</p>
+        </div>
+      ) : winners.length === 0 ? (
         <div className="text-center py-20 bg-[#12142d] rounded-3xl border border-white/10">
           <Trophy className="w-12 h-12 text-white/20 mx-auto mb-3" />
           <h3 className="font-serif text-lg font-bold text-white/60">No Winners Found</h3>
@@ -637,6 +605,13 @@ export default function Winners() {
                       }`}>
                         <Sparkles className="w-3 h-3 shrink-0" />
                         <span>{winner.offerTag}</span>
+                      </div>
+                    )}
+                    {/* Diwali Day Lucky Spin Winner Hallmark Badge */}
+                    {winner.isSpinWinner && (
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold tracking-wide bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-600/20 border border-amber-400/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin" />
+                        <span>Diwali Day Lucky Spin Winner</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between pt-1">

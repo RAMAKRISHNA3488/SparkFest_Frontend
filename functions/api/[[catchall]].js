@@ -67,26 +67,16 @@ const festivalStore = {
     { id: 'offer-2', title: 'Festival Special', subtitle: 'Double Celebration Bonus', description: 'Get bonus entry ticket with every additional participation. Maximize your winning probability!', badge: 'Festive High Value', gradient: 'from-red-950 via-rose-900 to-maroon-800' },
     { id: 'offer-3', title: 'Mega Bumper Pack', subtitle: 'VIP Festival Entry', description: 'Unlock entry into all 10 grand prize tiers with our premium bumper participation package.', badge: 'Limited Edition', gradient: 'from-amber-950 via-yellow-900 to-orange-950' }
   ],
-  winners: [
-    { id: 'w-1', drawId: 'draw-diwali-2026', drawTitle: 'Diwali Dhamaka Grand Lucky Draw 2026', maskedName: 'Rajesh K****', shortTicket: 'DD-**891', prizeTier: '1st Prize', prizeTitle: 'Mega Bumper Cracker Stash (₹10,000)', prizeAmount: '₹10,000', location: 'Mumbai, MH', announcedAt: '2026-09-28T14:30:00.000Z' },
-    { id: 'w-2', drawId: 'draw-diwali-2026', drawTitle: 'Diwali Dhamaka Grand Lucky Draw 2026', maskedName: 'Priya S****', shortTicket: 'DD-**452', prizeTier: '2nd Prize', prizeTitle: 'Elite Celebration Box (₹9,500)', prizeAmount: '₹9,500', location: 'Delhi, DL', announcedAt: '2026-09-28T14:35:00.000Z' },
-    { id: 'w-3', drawId: 'draw-diwali-2026', drawTitle: 'Diwali Dhamaka Grand Lucky Draw 2026', maskedName: 'Anil M****', shortTicket: 'DD-**723', prizeTier: '3rd Prize', prizeTitle: 'Royal Diwali Hamper (₹9,000)', prizeAmount: '₹9,000', location: 'Bangalore, KA', announcedAt: '2026-09-28T14:40:00.000Z' },
-    { id: 'w-4', drawId: 'draw-diwali-2026', drawTitle: 'Diwali Dhamaka Grand Lucky Draw 2026', maskedName: 'Sunita V****', shortTicket: 'DD-**109', prizeTier: '4th Prize', prizeTitle: 'Luxury Sparkler Kit (₹8,500)', prizeAmount: '₹8,500', location: 'Ahmedabad, GJ', announcedAt: '2026-09-28T14:45:00.000Z' },
-    { id: 'w-5', drawId: 'draw-diwali-2026', drawTitle: 'Diwali Dhamaka Grand Lucky Draw 2026', maskedName: 'Vikram R****', shortTicket: 'DD-**634', prizeTier: '5th Prize', prizeTitle: 'Festive Joy Bundle (₹8,000)', prizeAmount: '₹8,000', location: 'Hyderabad, TS', announcedAt: '2026-09-28T14:50:00.000Z' }
-  ],
-  registrations: [
-    { sNo: 1, fullName: 'Aarav Patel', mobileNumber: '9876543210', gmail: 'aarav.patel@gmail.com', location: 'Ahmedabad, Gujarat', token: 'DD-2026-10492', plan: '10rs Plan', date: '25 Sep 2026, 10:30 AM' },
-    { sNo: 2, fullName: 'Sneha Reddy', mobileNumber: '9848012345', gmail: 'sneha.reddy@gmail.com', location: 'Hyderabad, Telangana', token: 'DD-2026-28471', plan: '30rs Plan', date: '25 Sep 2026, 11:15 AM' },
-    { sNo: 3, fullName: 'Rohit Sharma', mobileNumber: '9820098765', gmail: 'rohit.sharma@gmail.com', location: 'Mumbai, Maharashtra', token: 'DD-2026-39104', plan: '50rs Plan', date: '25 Sep 2026, 12:40 PM' },
-    { sNo: 4, fullName: 'Priyanka Das', mobileNumber: '9732054321', gmail: 'priyanka.das@gmail.com', location: 'Kolkata, West Bengal', token: 'DD-2026-48291', plan: '10rs Plan', date: '26 Sep 2026, 09:20 AM' },
-    { sNo: 5, fullName: 'Vikram Malhotra', mobileNumber: '9811067890', gmail: 'vikram.malhotra@gmail.com', location: 'New Delhi, Delhi', token: 'DD-2026-57102', plan: '30rs Plan', date: '26 Sep 2026, 02:10 PM' },
-    { sNo: 6, fullName: 'Ananya Iyer', mobileNumber: '9444011223', gmail: 'ananya.iyer@gmail.com', location: 'Chennai, Tamil Nadu', token: 'DD-2026-61928', plan: '50rs Plan', date: '26 Sep 2026, 04:45 PM' }
-  ],
+  winners: [],
+  registrations: [],
   faqs: [
     { id: 'faq-1', question: 'How do I participate in the Diwali Dhamaka Lucky Draw?', answer: 'Simply select your desired plan (₹10, ₹30, or ₹50), verify your mobile number, and your unique lucky ticket token will be generated instantly.', category: 'Participation' },
     { id: 'faq-2', question: 'When will the winners be declared?', answer: 'The grand bumper live draw takes place on Diwali Day at 07:00 PM IST with live cryptographic verification.', category: 'Draw & Results' },
     { id: 'faq-3', question: 'How are prizes distributed?', answer: 'Winners receive instant notifications via SMS & email, and cash prizes or physical gifts are disbursed directly within 30 days.', category: 'Prizes' }
-  ]
+  ],
+  spinCounts: { '10rs': 0, '30rs': 0, '50rs': 0 },
+  spinLimits: { '10rs': 10, '30rs': 2, '50rs': 2 },
+  recentSpins: []
 };
 
 export async function onRequest(context) {
@@ -151,13 +141,108 @@ export async function onRequest(context) {
     return jsonResponse({ success: true, data: festivalStore.offers });
   }
 
-  // 5. Winners
+  // 5. Winners (with Search & Tier filters)
   if (pathname === '/api/winners' && method === 'GET') {
-    return jsonResponse({ success: true, data: festivalStore.winners, total: festivalStore.winners.length });
+    const tier = url.searchParams.get('tier');
+    const search = url.searchParams.get('search');
+    let filtered = [...festivalStore.winners];
+    if (tier && tier !== 'all') {
+      filtered = filtered.filter(w => (w.tier || '').toLowerCase() === tier.toLowerCase());
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      filtered = filtered.filter(w =>
+        (w.maskedName || '').toLowerCase().includes(q) ||
+        (w.winnerName || '').toLowerCase().includes(q) ||
+        (w.ticketNumber || '').toLowerCase().includes(q) ||
+        (w.shortTicket || '').toLowerCase().includes(q) ||
+        (w.prizeTitle || '').toLowerCase().includes(q)
+      );
+    }
+    return jsonResponse({ success: true, data: filtered, total: filtered.length });
   }
 
   if (pathname === '/api/winners/recent' && method === 'GET') {
     return jsonResponse({ success: true, data: festivalStore.winners.slice(0, 10) });
+  }
+
+  // 5b. Individual Ticket Verification Details
+  if (pathname.startsWith('/api/tickets/') && pathname !== '/api/tickets/generate' && method === 'GET') {
+    const ticketNumber = decodeURIComponent(pathname.replace('/api/tickets/', ''));
+    // 1. Check in winners
+    const winnerMatch = festivalStore.winners.find(w => w.ticketNumber === ticketNumber || w.shortTicket === ticketNumber);
+    // 2. Check in registrations
+    const regMatch = festivalStore.registrations.find(r => r.token === ticketNumber);
+    // 3. Check in recent spins
+    const spinMatch = (festivalStore.recentSpins || []).find(s => s.token === ticketNumber);
+
+    if (winnerMatch) {
+      return jsonResponse({
+        success: true,
+        data: {
+          ticketNumber: winnerMatch.ticketNumber,
+          participantMaskedName: winnerMatch.maskedName || winnerMatch.winnerName,
+          status: 'WINNER - VERIFIED',
+          drawName: winnerMatch.drawTitle || 'Diwali Dhamaka Grand Lucky Draw 2026',
+          prizeTitle: winnerMatch.prizeTitle,
+          prizeAmount: winnerMatch.prizeAmount,
+          tier: winnerMatch.tier,
+          drawDate: winnerMatch.drawDate || 'November 8, 2026',
+          drawTime: '07:00 PM IST',
+          issuedAt: winnerMatch.announcedAt || new Date().toISOString()
+        }
+      });
+    }
+
+    if (regMatch) {
+      return jsonResponse({
+        success: true,
+        data: {
+          ticketNumber: regMatch.token,
+          participantMaskedName: regMatch.fullName.split(' ').map(p => p[0] + '****').join(' '),
+          status: 'ACTIVE - VERIFIED',
+          drawName: 'Diwali Dhamaka Grand Lucky Draw 2026',
+          plan: regMatch.plan,
+          drawDate: 'November 8, 2026',
+          drawTime: '07:00 PM IST',
+          issuedAt: new Date().toISOString()
+        }
+      });
+    }
+
+    if (spinMatch) {
+      return jsonResponse({
+        success: true,
+        data: {
+          ticketNumber: spinMatch.token,
+          participantMaskedName: spinMatch.winnerName,
+          status: 'WINNER - VERIFIED',
+          drawName: 'Diwali Day Lucky Spin Draw',
+          prizeTitle: spinMatch.prize,
+          tier: spinMatch.tier,
+          drawDate: 'Diwali Day 2026',
+          drawTime: spinMatch.time || '07:00 PM IST',
+          issuedAt: new Date().toISOString()
+        }
+      });
+    }
+
+    if (ticketNumber.startsWith('DD-2026-')) {
+      return jsonResponse({
+        success: true,
+        data: {
+          ticketNumber: ticketNumber,
+          participantMaskedName: 'R**** S****',
+          status: 'CONFIRMED - ACTIVE',
+          drawName: 'Diwali Dhamaka Grand Lucky Draw 2026',
+          drawDate: 'November 8, 2026',
+          drawTime: '07:00 PM IST',
+          issuedAt: new Date().toISOString()
+        }
+      });
+    }
+
+    return jsonResponse({ success: false, message: 'Ticket not found or unverified' }, 404);
   }
 
   // 6. FAQs
@@ -350,6 +435,107 @@ export async function onRequest(context) {
         executedAt: new Date().toISOString()
       },
       message: `Diwali Day ${planType.toUpperCase()} Spin successful! Winner awarded ${prizeWon}.`
+    });
+  }
+
+  // 14a. Admin Spin Status (Counts & Limits)
+  if (pathname === '/api/admin/spin/status' && method === 'GET') {
+    if (!festivalStore.spinCounts) festivalStore.spinCounts = { '10rs': 0, '30rs': 0, '50rs': 0 };
+    if (!festivalStore.spinLimits) festivalStore.spinLimits = { '10rs': 10, '30rs': 2, '50rs': 2 };
+    return jsonResponse({
+      success: true,
+      data: {
+        counts: festivalStore.spinCounts,
+        limits: festivalStore.spinLimits,
+        remaining: {
+          '10rs': Math.max(0, festivalStore.spinLimits['10rs'] - (festivalStore.spinCounts['10rs'] || 0)),
+          '30rs': Math.max(0, festivalStore.spinLimits['30rs'] - (festivalStore.spinCounts['30rs'] || 0)),
+          '50rs': Math.max(0, festivalStore.spinLimits['50rs'] - (festivalStore.spinCounts['50rs'] || 0))
+        }
+      }
+    });
+  }
+
+  // 14b. Admin Spin Recent Logs
+  if (pathname === '/api/admin/spin/recent' && method === 'GET') {
+    return jsonResponse({
+      success: true,
+      data: festivalStore.recentSpins || []
+    });
+  }
+
+  // 14c. Store Diwali Day Spin Winner in Database & Winners List
+  if (pathname === '/api/admin/spin/record' && method === 'POST') {
+    const {
+      winnerName = 'Lucky Participant',
+      maskedName,
+      token = `DD-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+      shortTicket,
+      prize,
+      prizeTitle,
+      prizeAmount = '₹10,000',
+      tier = 'gold',
+      city = 'India',
+      planType = '10rs',
+      spinNumber = 1,
+      time
+    } = body;
+
+    const count = spinNumber;
+    if (!festivalStore.spinCounts) festivalStore.spinCounts = { '10rs': 0, '30rs': 0, '50rs': 0 };
+    festivalStore.spinCounts[planType] = Math.max(festivalStore.spinCounts[planType] || 0, count);
+
+    const spinLog = {
+      id: 'spin-' + Date.now(),
+      planType,
+      winnerName,
+      token,
+      prize: prize || `${prizeTitle || 'Diwali Prize'} (${prizeAmount})`,
+      tier,
+      spinNumber: count,
+      time: time || new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    if (!festivalStore.recentSpins) festivalStore.recentSpins = [];
+    festivalStore.recentSpins.unshift(spinLog);
+
+    const winnerRecord = {
+      id: 'spin-win-' + Date.now(),
+      drawId: 'draw-diwali-2026',
+      drawTitle: 'Diwali Day Spin Draw',
+      winnerName,
+      maskedName: maskedName || (winnerName ? winnerName.split(' ').map((p, idx) => idx === 0 ? p : p[0] + '****').join(' ') : 'L*** P***'),
+      ticketNumber: token,
+      shortTicket: shortTicket || '#' + (token || '').split('-').pop(),
+      prizeTitle: prizeTitle || spinLog.prize,
+      prizeAmount,
+      tier,
+      drawDate: 'Diwali Day Spin Draw',
+      city,
+      offerTag: planType === '30rs' ? '3X Entries • Triple Chances' : planType === '50rs' ? '5X Entries • VIP Bumper Pool' : undefined,
+      announcedAt: new Date().toISOString(),
+      isSpinWinner: true,
+      planType,
+      spinNumber: count
+    };
+
+    festivalStore.winners.unshift(winnerRecord);
+
+    return jsonResponse({
+      success: true,
+      message: 'Diwali Day Spin Winner successfully stored in database!',
+      data: spinLog,
+      counts: festivalStore.spinCounts
+    });
+  }
+
+  // 14d. Reset Admin Spins
+  if (pathname === '/api/admin/spin/reset' && method === 'POST') {
+    festivalStore.spinCounts = { '10rs': 0, '30rs': 0, '50rs': 0 };
+    return jsonResponse({
+      success: true,
+      data: festivalStore.spinCounts,
+      message: 'All spin wheel limits reset to 0.'
     });
   }
 

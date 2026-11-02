@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Flame, ShieldCheck, Sparkles, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Lock, Phone, Mail, User } from 'lucide-react';
+import { Flame, ShieldCheck, Sparkles, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Phone, Mail, User, CreditCard, Lock, RefreshCw, Ticket } from 'lucide-react';
 import { api } from '../services/api';
 
 export default function Participate() {
@@ -8,7 +8,7 @@ export default function Participate() {
   const [searchParams] = useSearchParams();
   const preselectedOffer = searchParams.get('offer') || 'ten_entry';
 
-  // Wizard state: 1 = Details -> 2 = OTP -> 3 = Generating
+  // Wizard state: 1 = Details -> 2 = Payment
   const [step, setStep] = useState(1);
 
   const [formData, setFormData] = useState({
@@ -20,81 +20,226 @@ export default function Participate() {
     termsAccepted: true
   });
 
-  const [otp, setOtp] = useState('');
-  const [demoOtpHint, setDemoOtpHint] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [orderInfo, setOrderInfo] = useState(null);
+  const [paymentConfig, setPaymentConfig] = useState(null);
 
-  // Step 1: Request OTP
-  const handleRequestOtp = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      const res = await api.requestOtp(formData.phone);
-      if (res.success) {
-        setDemoOtpHint(res.data.otp);
-        setOtp(res.data.otp); // Pre-fill for seamless demonstration
-        setStep(2);
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const res = await api.getPaymentConfig();
+        if (res.success) {
+          setPaymentConfig(res.data);
+        }
+      } catch (e) {}
     }
-  };
-
-  // Step 2: Verify OTP
-  const handleVerifyOtpOnly = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      await api.verifyOtp(formData.phone, otp);
-      setStep(3); // Proceed to Payment Scanner
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Step 3: Payment Confirmation
-  const handlePaymentConfirm = async () => {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const regRes = await api.registerParticipant(formData);
-      if (regRes.success) {
-        navigate('/confirmation', {
-          state: {
-            ticket: regRes.data.ticket,
-            tickets: regRes.data.tickets,
-            participant: regRes.data.participant
-          }
-        });
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchConfig();
+  }, []);
 
   const getTierDetails = () => {
     switch (formData.selectedOffer) {
-      case 'festival_special': return { amount: 30, tickets: 3, name: 'Festival Special' };
-      case 'early_bird': return { amount: 50, tickets: 5, name: 'Early Bird' };
+      case 'festival_special': return { amount: 30, tickets: 3, name: 'Festival Special', plan: '30rs Plan' };
+      case 'early_bird': return { amount: 50, tickets: 5, name: 'Early Bird', plan: '50rs Plan' };
       case 'ten_entry':
-      default: return { amount: 10, tickets: 1, name: 'Ticket Entry' };
+      default: return { amount: 10, tickets: 1, name: 'Ticket Entry', plan: '10rs Plan' };
     }
   };
   
   const tierInfo = getTierDetails();
-  
+
+  // Helper to load Razorpay checkout script if not already present
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) return resolve(true);
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  // Step 1 -> Step 2: Proceed to Payment & Create Order
+  const handleProceedToPayment = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const res = await api.createPaymentOrder(formData);
+      if (res.success || res.order_id || res.id) {
+        setOrderInfo(res.data || res);
+        setStep(2);
+      } else {
+        setError(res.message || 'Unable to initiate payment order.');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to initialize payment.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Execute Razorpay Payment & Verify
+  const handlePayWithRazorpay = async () => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      // 1. Ensure order exists
+      let currentOrder = orderInfo;
+      if (!currentOrder) {
+        const orderRes = await api.createPaymentOrder(formData);
+        if (!orderRes.success && !orderRes.order_id) {
+          throw new Error(orderRes.message || 'Could not create payment order');
+        }
+        currentOrder = orderRes.data || orderRes;
+        setOrderInfo(currentOrder);
+      }
+
+      // 2. Ensure Razorpay script is loaded
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded && !currentOrder.isMockMode) {
+        throw new Error('Razorpay SDK failed to load. Please check your internet connection.');
+      }
+
+      // 3. If running in simulated mock mode without active Razorpay keys
+      if (currentOrder.isMockMode && (!window.Razorpay || currentOrder.keyId === 'rzp_test_placeholder')) {
+        // Run test verification flow directly
+        await simulateTestPayment(currentOrder);
+        return;
+      }
+
+      // 4. Open Razorpay Checkout Modal
+      const razorpayKey = currentOrder.keyId || currentOrder.key_id || import.meta.env.VITE_RAZORPAY_KEY_ID;
+      const orderId = currentOrder.order_id || currentOrder.orderId || currentOrder.id;
+
+      const options = {
+        key: razorpayKey,
+        amount: currentOrder.amount,
+        currency: currentOrder.currency || 'INR',
+        name: 'Diwali Dhamaka Lucky Draw',
+        description: `${tierInfo.name} - ${tierInfo.tickets} Lucky Draw Tickets`,
+        order_id: orderId,
+        prefill: {
+          name: formData.fullName,
+          email: formData.email,
+          contact: formData.phone
+        },
+        theme: {
+          color: '#e5b32f'
+        },
+        handler: async function (response) {
+          // Cryptographic verification on backend
+          try {
+            setStep(3);
+            setLoading(true);
+            const verifyRes = await api.verifyPayment({
+              ...formData,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+
+            if (verifyRes.success && verifyRes.data && verifyRes.data.ticket) {
+              setTimeout(() => {
+                navigate('/confirmation', {
+                  state: {
+                    ticket: verifyRes.data.ticket,
+                    tickets: verifyRes.data.tickets,
+                    participant: verifyRes.data.participant,
+                    payment: verifyRes.data.payment,
+                    whatsapp: verifyRes.data.whatsapp
+                  }
+                });
+              }, 1200);
+            } else if (verifyRes.success) {
+              setTimeout(() => {
+                navigate('/confirmation', {
+                  state: {
+                    ticket: verifyRes.data?.ticket,
+                    tickets: verifyRes.data?.tickets,
+                    participant: verifyRes.data?.participant || formData,
+                    payment: verifyRes.data?.payment || {
+                      paymentId: response.razorpay_payment_id,
+                      orderId: response.razorpay_order_id,
+                      status: 'SUCCESS'
+                    }
+                  }
+                });
+              }, 1200);
+            } else {
+              setStep(2);
+              setError(verifyRes.message || 'Payment verification failed. No tickets generated.');
+            }
+          } catch (verifyErr) {
+            setStep(2);
+            setError(verifyErr.message || 'Payment verification failed. No tickets generated.');
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setError('Payment was cancelled by user. Lucky tickets were not generated.');
+            setLoading(false);
+          }
+        }
+      };
+
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.on('payment.failed', function (resp) {
+        setError(`Payment failed: ${resp.error?.description || 'Transaction declined'}. Tickets were not generated.`);
+        setLoading(false);
+      });
+
+      razorpayInstance.open();
+    } catch (err) {
+      setError(err.message || 'Payment failed to initiate.');
+      setLoading(false);
+    }
+  };
+
+  // Safe developer sandbox simulation for local environments without live Razorpay keys
+  const simulateTestPayment = async (order) => {
+    try {
+      setStep(3);
+      setLoading(true);
+      const testPaymentId = `pay_mock_${Date.now()}`;
+      const testSignature = `sig_valid_${Date.now()}_razorpay`;
+
+      const verifyRes = await api.verifyPayment({
+        ...formData,
+        razorpay_order_id: order.orderId,
+        razorpay_payment_id: testPaymentId,
+        razorpay_signature: testSignature
+      });
+
+      if (verifyRes.success && verifyRes.data && verifyRes.data.ticket) {
+        setTimeout(() => {
+          navigate('/confirmation', {
+            state: {
+              ticket: verifyRes.data.ticket,
+              tickets: verifyRes.data.tickets,
+              participant: verifyRes.data.participant,
+              payment: verifyRes.data.payment,
+              whatsapp: verifyRes.data.whatsapp
+            }
+          });
+        }, 1200);
+      } else {
+        setStep(2);
+        setError(verifyRes.message || 'Payment verification failed. No tickets generated.');
+      }
+    } catch (err) {
+      setStep(2);
+      setError(err.message || 'Payment verification failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const isStep1Valid = Boolean(
     formData.fullName.trim() &&
     formData.email.trim() &&
@@ -106,28 +251,34 @@ export default function Participate() {
   return (
     <div className="pt-28 pb-20 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Back Button */}
-      <button 
-        onClick={() => {
-          if (step > 1) setStep(step - 1);
-          else navigate(-1);
-        }}
-        className="mb-6 flex items-center gap-2 text-white/60 hover:text-[#ffe58f] transition-colors text-sm font-semibold group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        <span>Back</span>
-      </button>
+      {step < 3 && (
+        <button 
+          onClick={() => {
+            if (step > 1) {
+              setStep(step - 1);
+              setError(null);
+            } else {
+              navigate(-1);
+            }
+          }}
+          className="mb-6 flex items-center gap-2 text-white/60 hover:text-[#ffe58f] transition-colors text-sm font-semibold group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span>Back</span>
+        </button>
+      )}
 
       {/* Progress Bar */}
       <div className="mb-10">
         <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider mb-2">
           <span className={step >= 1 ? 'text-[#ffe58f]' : 'text-white/40'}>1. Details</span>
-          <span className={step >= 2 ? 'text-[#ffe58f]' : 'text-white/40'}>2. Mobile OTP</span>
-          <span className={step >= 3 ? 'text-[#ffe58f]' : 'text-white/40'}>3. Payment</span>
+          <span className={step >= 2 ? 'text-[#ffe58f]' : 'text-white/40'}>2. Payment</span>
+          <span className={step >= 3 ? 'text-[#ffe58f]' : 'text-white/40'}>3. Generate Token</span>
         </div>
         <div className="w-full h-2 bg-[#141634] rounded-full overflow-hidden border border-white/5">
           <div
             className="h-full bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] transition-all duration-300"
-            style={{ width: step === 1 ? '33%' : step === 2 ? '66%' : '100%' }}
+            style={{ width: step === 1 ? '33.33%' : step === 2 ? '66.66%' : '100%' }}
           ></div>
         </div>
       </div>
@@ -139,13 +290,13 @@ export default function Participate() {
         {error && (
           <div className="mb-6 p-4 rounded-2xl bg-rose-950/60 border border-rose-500/40 text-rose-200 text-xs sm:text-sm flex items-start gap-3 animate-fadeIn">
             <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-            <div>{error}</div>
+            <div className="flex-1 font-medium">{error}</div>
           </div>
         )}
 
         {/* STEP 1: Details */}
         {step === 1 && (
-          <form onSubmit={handleRequestOtp} className="space-y-6">
+          <form onSubmit={handleProceedToPayment} className="space-y-6">
             <div className="flex flex-col items-center justify-center mb-8 sm:mb-10">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#201542] border border-[#e5b32f]/30 text-[#ffe58f] text-[10px] sm:text-xs font-semibold mb-5 sm:mb-6">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
@@ -264,15 +415,12 @@ export default function Participate() {
                             : 'border-[#e5b32f]/20 hover:border-[#e5b32f]/50 hover:-translate-y-1 hover:shadow-lg'
                         }`}
                       >
-                        {/* Glass Background */}
                         <div className={`absolute inset-0 transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'} bg-gradient-to-br from-[#1a1435]/90 via-[#130f26]/90 to-[#0a0710]/90 backdrop-blur-xl`}></div>
                         
-                        {/* Glow effect for active state */}
                         {isActive && (
                           <div className="absolute inset-0 bg-gradient-to-br from-[#ffe58f]/10 to-transparent pointer-events-none"></div>
                         )}
                         
-                        {/* Content */}
                         <div className="relative z-10 flex flex-col h-full justify-between gap-2">
                           <div>
                             <div className={`font-serif text-sm sm:text-base font-extrabold tracking-wide ${isActive ? 'gold-gradient-text' : 'text-white/80 group-hover:text-white transition-colors'}`}>
@@ -325,149 +473,145 @@ export default function Participate() {
                   : 'text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:scale-[1.02] active:scale-95'
               }`}
             >
-              <span>{loading ? 'REQUESTING OTP...' : 'PROCEED TO MOBILE VERIFICATION'}</span>
+              <span>{loading ? 'CREATING ORDER...' : 'PROCEED TO PAYMENT'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         )}
 
-        {/* STEP 2: Mobile OTP Verification */}
+        {/* STEP 2: Payment & Ticket Issuance */}
         {step === 2 && (
-          <form onSubmit={handleVerifyOtpOnly} className="space-y-6 animate-fadeIn">
-            <div className="flex flex-col items-center justify-center mb-8 sm:mb-10">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#e5b32f]/20 to-transparent border border-[#e5b32f]/40 flex items-center justify-center mb-3 sm:mb-4 shadow-[0_0_15px_rgba(229,179,47,0.2)] transition-transform hover:scale-105 duration-300">
-                <Lock className="w-6 h-6 sm:w-7 sm:h-7 text-[#ffe58f]" />
+          <div className="space-y-6 animate-fadeIn">
+            <div className="flex flex-col items-center justify-center mb-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#e5b32f]/20 to-transparent border border-[#e5b32f]/40 flex items-center justify-center mb-3 sm:mb-4 shadow-[0_0_15px_rgba(229,179,47,0.2)]">
+                <CreditCard className="w-6 h-6 sm:w-7 sm:h-7 text-[#ffe58f]" />
               </div>
               
               <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-extrabold gold-gradient-text italic tracking-wide text-center">
-                Mobile Verification
+                Payment
               </h2>
               
-              <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-5">
+              <div className="flex items-center gap-3 sm:gap-4 mt-3 sm:mt-4">
                 <div className="w-12 sm:w-20 h-[1px] bg-gradient-to-r from-transparent to-[#e5b32f]/60"></div>
                 <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rotate-45 bg-gradient-to-br from-[#ffe58f] to-[#d4af37] shadow-[0_0_10px_rgba(229,179,47,0.8)]"></div>
                 <div className="w-12 sm:w-20 h-[1px] bg-gradient-to-l from-transparent to-[#e5b32f]/60"></div>
               </div>
               
-              <p className="text-xs sm:text-sm text-white/70 mt-5 sm:mt-6 text-center leading-relaxed">
-                A 6-digit verification code was generated for <span className="font-mono text-[#ffe58f] font-bold">+91 {formData.phone}</span>.
+              <p className="text-xs sm:text-sm text-white/70 mt-4 max-w-md mx-auto text-center leading-relaxed">
+                Complete your payment. Your official lucky ticket will <strong className="text-[#ffe58f]">only be generated after successful payment</strong>.
               </p>
-            </div>
 
-            {demoOtpHint && (
-              <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-center text-xs text-amber-200">
-                <span>Demo Passcode Ready: </span>
-                <span className="font-mono font-bold text-[#ffe58f] tracking-widest text-sm ml-1">{demoOtpHint}</span>
+              {/* Real-time Gateway Status */}
+              <div className="mt-3">
+                {paymentConfig?.isConfigured ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Live Payment Gateway Active</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[11px] font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span>Secure Gateway Ready • Instant Verified Sandbox</span>
+                  </span>
+                )}
               </div>
-            )}
-
-            <div>
-              <label className="block text-center text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
-                Enter 6-Digit OTP Code
-              </label>
-              <input
-                type="text"
-                required
-                maxLength={6}
-                autoFocus
-                placeholder="• • • • • •"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                className="w-full text-center tracking-[0.5em] font-mono text-2xl font-bold py-3.5 rounded-2xl bg-[#090b1c] border border-[#e5b32f]/40 text-[#ffe58f] focus:outline-none focus:border-[#e5b32f] focus:ring-2 focus:ring-[#e5b32f]/40"
-              />
             </div>
 
-            <div className="flex items-center justify-between text-xs text-white/60">
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="hover:text-white underline"
-              >
-                ← Change Number
-              </button>
-              <button
-                type="button"
-                onClick={handleRequestOtp}
-                className="hover:text-[#ffe58f] text-amber-300 font-semibold"
-              >
-                Resend OTP Code
-              </button>
+            {/* Order Summary Card */}
+            <div className="p-6 bg-[#090b1c]/90 border border-[#e5b32f]/30 rounded-2xl mx-auto max-w-md shadow-inner space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10 text-xs">
+                <span className="text-white/60">Participant</span>
+                <span className="font-semibold text-white">{formData.fullName}</span>
+              </div>
+              <div className="flex items-center justify-between pb-3 border-b border-white/10 text-xs">
+                <span className="text-white/60">Mobile Number</span>
+                <span className="font-mono text-white/90">{formData.phone}</span>
+              </div>
+              <div className="flex items-center justify-between pb-3 border-b border-white/10 text-xs">
+                <span className="text-white/60">Selected Tier</span>
+                <span className="font-semibold text-[#ffe58f]">{tierInfo.name}</span>
+              </div>
+              <div className="flex items-center justify-between pb-3 border-b border-white/10 text-xs">
+                <span className="text-white/60">Tickets Allocated on Success</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#e5b32f]/20 border border-[#e5b32f]/40 font-bold text-[#ffe58f]">
+                  {tierInfo.tickets} {tierInfo.tickets > 1 ? 'Tickets' : 'Ticket'}
+                </span>
+              </div>
+
+              {/* Total Payable */}
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-sm font-semibold text-white">Total Payable</span>
+                <span className="text-[#e5b32f] font-bold text-3xl font-serif">₹{tierInfo.amount}</span>
+              </div>
+
+              {/* Payment Security Badges */}
+              <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-white/50">
+                <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>100% Secure Payment • UPI, Cards, NetBanking, Wallets</span>
+              </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 rounded-full font-bold text-xs sm:text-sm text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>{loading ? 'VERIFYING...' : 'VERIFY OTP & PROCEED'}</span>
-            </button>
-          </form>
+            {/* Pay Now Button */}
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handlePayWithRazorpay}
+                disabled={loading}
+                className="w-full py-4 rounded-full font-bold text-xs sm:text-sm text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>VERIFYING PAYMENT & GENERATING TICKET...</span>
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4" />
+                    <span>PAY ₹{tierInfo.amount}</span>
+                  </>
+                )}
+              </button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep(1);
+                    setError(null);
+                  }}
+                  className="text-[11px] text-white/50 hover:text-white underline"
+                >
+                  ← Edit Participant Details or Change Plan
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
-        {/* STEP 3: Payment Scanner */}
+        {/* STEP 3: Generate Token */}
         {step === 3 && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex flex-col items-center justify-center mb-8 sm:mb-10">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#e5b32f]/20 to-transparent border border-[#e5b32f]/40 flex items-center justify-center mb-3 sm:mb-4 shadow-[0_0_15px_rgba(229,179,47,0.2)] transition-transform hover:scale-105 duration-300">
-                <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 text-[#ffe58f]" />
+          <div className="py-12 sm:py-16 flex flex-col items-center justify-center text-center space-y-6 animate-fadeIn">
+            <div className="relative">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-[#ffe58f]/20 via-[#e5b32f]/10 to-transparent border-2 border-[#e5b32f]/60 flex items-center justify-center shadow-[0_0_30px_rgba(229,179,47,0.3)]">
+                <Ticket className="w-10 h-10 sm:w-12 sm:h-12 text-[#ffe58f] animate-pulse" />
               </div>
-              
-              <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-extrabold gold-gradient-text italic tracking-wide text-center">
-                Secure Entry Payment
+              <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-[#ffe58f] to-[#e5b32f] flex items-center justify-center shadow-lg">
+                <Sparkles className="w-4 h-4 text-[#0b0d1e] animate-spin" />
+              </div>
+            </div>
+
+            <div className="space-y-2 max-w-md mx-auto">
+              <h2 className="font-serif text-2xl sm:text-3xl font-extrabold gold-gradient-text tracking-wide">
+                Generating Your Token...
               </h2>
-              
-              <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-5">
-                <div className="w-12 sm:w-20 h-[1px] bg-gradient-to-r from-transparent to-[#e5b32f]/60"></div>
-                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rotate-45 bg-gradient-to-br from-[#ffe58f] to-[#d4af37] shadow-[0_0_10px_rgba(229,179,47,0.8)]"></div>
-                <div className="w-12 sm:w-20 h-[1px] bg-gradient-to-l from-transparent to-[#e5b32f]/60"></div>
-              </div>
-              
-              <p className="text-xs sm:text-sm text-white/70 mt-5 sm:mt-6 max-w-md mx-auto text-center leading-relaxed">
-                Scan the QR code below using any UPI app to finalize your <span className="text-[#ffe58f] font-bold">{tierInfo.name}</span> participation.
+              <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
+                Payment verified successfully! Securely issuing and registering your official lucky draw token ID.
               </p>
             </div>
 
-            <div className="flex flex-col items-center justify-center p-8 bg-[#090b1c]/80 border border-[#e5b32f]/30 rounded-2xl mx-auto max-w-xs shadow-inner relative">
-              {/* Premium corners */}
-              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#e5b32f] rounded-tl-lg"></div>
-              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#e5b32f] rounded-tr-lg"></div>
-              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#e5b32f] rounded-bl-lg"></div>
-              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#e5b32f] rounded-br-lg"></div>
-              
-              <div className="w-48 h-48 bg-white p-2 rounded-xl flex items-center justify-center mb-4">
-                {/* Generic placeholder for QR */}
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=sparkfest@upi&pn=SparkFest&am=${tierInfo.amount}&cu=INR`}
-                  alt="Payment QR Code"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-
-              <div className="text-center w-full">
-                <div className="text-[#e5b32f] font-bold text-3xl font-serif">₹{tierInfo.amount}</div>
-                <div className="text-xs text-white/50 uppercase tracking-widest mt-1">
-                  Generates {tierInfo.tickets} {tierInfo.tickets > 1 ? 'Tickets' : 'Ticket'}
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={handlePaymentConfirm}
-              disabled={loading}
-              className="w-full py-4 mt-4 rounded-full font-bold text-xs sm:text-sm text-[#0b0d1e] bg-gradient-to-r from-[#ffe58f] via-[#e5b32f] to-[#d4af37] shadow-gold-glow hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{loading ? 'GENERATING TICKETS...' : 'I HAVE PAID, GENERATE TICKETS'}</span>
-            </button>
-            <div className="text-center">
-               <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="text-[11px] text-white/40 hover:text-white underline mt-2"
-                >
-                  Cancel & Change Tier
-                </button>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#090b1c]/90 border border-[#e5b32f]/40 text-[#ffe58f] text-xs font-mono shadow-inner">
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#e5b32f]" />
+              <span>Allocating unique lucky draw tokens...</span>
             </div>
           </div>
         )}

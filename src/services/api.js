@@ -48,8 +48,14 @@ export const api = {
 
   // Winners
   async getWinners(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${API_BASE}/winners?${query}`);
+    const cleanParams = {};
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null && v !== '' && v !== 'all' && v !== 'undefined' && v !== 'null') {
+        cleanParams[k] = v;
+      }
+    }
+    const query = new URLSearchParams(cleanParams).toString();
+    const res = await fetch(`${API_BASE}/winners${query ? `?${query}` : ''}`);
     return handleResponse(res);
   },
 
@@ -96,6 +102,43 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
+    return handleResponse(res);
+  },
+
+  // Payment & Ticket Generation (Razorpay Standard Web Checkout)
+  async createPaymentOrder(data) {
+    const res = await fetch(`${API_BASE}/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return handleResponse(res);
+  },
+
+  async createOrder(data) {
+    return this.createPaymentOrder(data);
+  },
+
+  async verifyPayment(data) {
+    const res = await fetch(`${API_BASE}/verify-payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return handleResponse(res);
+  },
+
+  async verifyPaymentSignature(data) {
+    return this.verifyPayment(data);
+  },
+
+  async getPaymentConfig() {
+    const res = await fetch(`${API_BASE}/payment/config`);
+    return handleResponse(res);
+  },
+
+  async getPaymentStatus(orderId) {
+    const res = await fetch(`${API_BASE}/payment/status/${orderId}`);
     return handleResponse(res);
   },
 
@@ -183,6 +226,41 @@ export const api = {
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({ planType })
+    });
+    return handleResponse(res);
+  },
+
+  async getAdminSpinStatus(token) {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/admin/spin/status`, { headers });
+    return handleResponse(res);
+  },
+
+  async getRecentSpins(token) {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/admin/spin/recent`, { headers });
+    return handleResponse(res);
+  },
+
+  async recordSpinWinner(spinData, token) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/admin/spin/record`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(spinData)
+    });
+    return handleResponse(res);
+  },
+
+  async resetAdminSpins(token) {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/admin/spin/reset`, {
+      method: 'POST',
+      headers
     });
     return handleResponse(res);
   }
